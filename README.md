@@ -31,7 +31,9 @@
 ### List of core features:
 
 ##### These are things you must have for the game to be complete in a basic way.  
+
 #####    You should have a clear idea of you think you should be able to implement these, or have a plan for figuring them out / asking for help about them early in the project.  
+
         - Player Character  
         - Ingredients for soup  
         - Puzzles/activities for gathering each ingredient  
@@ -42,7 +44,9 @@
 ### List of secondary features:
 
 ##### These are things that are still important, but not as critical enough to be 'core'.  
+
 ##### It's best if you have a rough idea of how these would work as well, but you can get away with them being a bit less well-defined - if they fall through, you still have your core game intact.  
+
         - NPCs to serve as instructors for collecting each ingredient  
         - Rival Chef NPC for storyline  
         - Pop up Dialog when interacting with NPCs  
@@ -50,6 +54,7 @@
 ### List of bonus features:
 
 ##### These are things that would be nice to have, but are definitely non-essential. After 'core' and 'secondary' features are complete, these take priority.  
+
         - added storyline  
         - added complexity to making soup stage  
 
