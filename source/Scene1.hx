@@ -11,6 +11,8 @@ class Scene1 extends FlxState
 	{
 		super.create();
 
+		add(new FlxSprite(0, 0, AssetPaths.SoupLocation_png));
+
 		hero = new Hero(50, 50);
 		add(hero);
 	}

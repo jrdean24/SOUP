@@ -1,14 +1,11 @@
 package;
 
-import flixel.FlxState;
-import flixel.addons.ui.FlxButtonPlus;
-
+class Map extends FlxState
 {
 	var scene1Button:FlxButtonPlus;
 	var scene2Button:FlxButtonPlus;
 
-	override
-	public function create()
+	override public function create()
 	{
 		scene1Button = new FlxButtonPlus(50, 50, goToScene1, "Scene 1", 200, 50);
 		add(scene1Button);
@@ -21,22 +18,15 @@ import flixel.addons.ui.FlxButtonPlus;
 
 	private function goToScene1()
 	{
-		FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
-		{
-			FlxG.switchState(new Scene1());
-		});
+		FlxG.switchState(new Scene1());
 	}
 
 	private function goToScene2()
 	{
-		FlxG.camera.fade(FlxColor.BLACK, 0.33, false, function()
-		{
-			FlxG.switchState(new Scene2());
-		});
+		FlxG.switchState(new Scene2());
 	}
 
-	override
-	public function update(elapsed:Float)
+	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
 	}
