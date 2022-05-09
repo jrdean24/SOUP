@@ -6,6 +6,8 @@ import flixel.util.FlxColor;
 
 class Hero extends FlxSprite
 {
+	var SPEED:Int = 200;
+
 	public function new(x:Float = 0, y:Float = 0)
 	{
 		super(x, y);
@@ -18,25 +20,25 @@ class Hero extends FlxSprite
 	{
 		if (FlxG.keys.pressed.LEFT)
 		{
-			velocity.x = -100;
+			velocity.x = -SPEED;
 			velocity.y = 0;
 		}
 
 		if (FlxG.keys.pressed.RIGHT)
 		{
-			velocity.x = 100;
+			velocity.x = SPEED;
 			velocity.y = 0;
 		}
 
 		if (FlxG.keys.pressed.UP)
 		{
-			velocity.y = -100;
+			velocity.y = -SPEED;
 			velocity.x = 0;
 		}
 
 		if (FlxG.keys.pressed.DOWN)
 		{
-			velocity.y = 100;
+			velocity.y = SPEED;
 			velocity.x = 0;
 		}
 

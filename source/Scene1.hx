@@ -1,6 +1,7 @@
 package;
 
 import character.Hero;
+import flixel.FlxSprite;
 import flixel.FlxState;
 
 class Scene1 extends FlxState
@@ -11,7 +12,7 @@ class Scene1 extends FlxState
 	{
 		super.create();
 
-		add(new FlxSprite(0, 0, AssetPaths.SoupLocation_png));
+		add(new FlxSprite(0, 0, "assets/images/SoupLocation.png"));
 
 		hero = new Hero(50, 50);
 		add(hero);
