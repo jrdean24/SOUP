@@ -1,12 +1,11 @@
 package;
 
+import character.Hero;
 import flixel.FlxState;
-import haxe.display.Protocol.HaxeResponseErrorData;
-import hero.Hero;
 
-class PlayState extends FlxState
+class Scene1 extends FlxState
 {
-	var hero:hero.Hero;
+	var hero:character.Hero;
 
 	override public function create()
 	{
