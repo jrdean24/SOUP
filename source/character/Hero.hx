@@ -18,34 +18,55 @@ class Hero extends FlxSprite
 
 	override public function update(elapsed:Float)
 	{
-		if (FlxG.keys.pressed.LEFT)
-		{
-			velocity.x = -SPEED;
-			velocity.y = 0;
-		}
-
-		if (FlxG.keys.pressed.RIGHT)
+		// limit movement to onscreen
+		// vibrates a bit, but its fine
+		if (x < 0)
 		{
 			velocity.x = SPEED;
-			velocity.y = 0;
 		}
-
-		if (FlxG.keys.pressed.UP)
+		else if (x > FlxG.width - width)
 		{
-			velocity.y = -SPEED;
-			velocity.x = 0;
+			velocity.x = -SPEED;
 		}
-
-		if (FlxG.keys.pressed.DOWN)
+		else if (y < 0)
 		{
 			velocity.y = SPEED;
-			velocity.x = 0;
 		}
-
-		if (FlxG.keys.pressed.UP == false && FlxG.keys.pressed.DOWN == false && FlxG.keys.pressed.LEFT == false && FlxG.keys.pressed.RIGHT == false)
+		else if (y > FlxG.height - height)
 		{
-			velocity.y = 0;
-			velocity.x = 0;
+			velocity.y = -SPEED;
+		}
+		else
+		{
+			if (FlxG.keys.pressed.LEFT)
+			{
+				velocity.x = -SPEED;
+				velocity.y = 0;
+			}
+
+			if (FlxG.keys.pressed.RIGHT)
+			{
+				velocity.x = SPEED;
+				velocity.y = 0;
+			}
+
+			if (FlxG.keys.pressed.UP)
+			{
+				velocity.y = -SPEED;
+				velocity.x = 0;
+			}
+
+			if (FlxG.keys.pressed.DOWN)
+			{
+				velocity.y = SPEED;
+				velocity.x = 0;
+			}
+
+			if (FlxG.keys.pressed.UP == false && FlxG.keys.pressed.DOWN == false && FlxG.keys.pressed.LEFT == false && FlxG.keys.pressed.RIGHT == false)
+			{
+				velocity.y = 0;
+				velocity.x = 0;
+			}
 		}
 
 		super.update(elapsed);
