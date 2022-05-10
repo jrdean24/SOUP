@@ -1,5 +1,6 @@
 package;
 
+import character.Inventory;
 import character.Hero;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -12,17 +13,25 @@ import item.Wall;
 // Carrot Farm
 class Scene2 extends FlxState
 {
+	var inventory:Inventory;
+	
 	var hero:character.Hero;
 	var carrots:FlxTypedGroup<item.Ingredient>;
 	var glowcarrots:FlxTypedGroup<item.Ingredient>;
 	var carrotCount:Int = 0;
 	var carrotNum:FlxText;
+	var currentStage:Int = 0;
 	var walls:FlxTypedGroup<item.Wall>;
 
 	// name to put into load graphics
 	var carrotPicture:String = "assets/images/Carrot.png";
 	var glowingCarrotTopPicture:String = "assets/images/glowingCarrotTop.png";
 	var carrotTopPicture:String = "assets/images/carrotTop.png";
+
+	public function new(incomingInventory:Inventory) {
+		super();
+		inventory = incomingInventory;
+	}
 
 	override public function create()
 	{
@@ -69,7 +78,7 @@ class Scene2 extends FlxState
 		hero = new Hero(50, 50);
 		add(hero);
 
-		carrotNum = new flixel.text.FlxText(0, 20, 0, "Carrots: " + carrotCount, 24, true);
+		carrotNum = new flixel.text.FlxText(0, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		add(carrotNum);
 	}
 
@@ -151,9 +160,9 @@ class Scene2 extends FlxState
 	public function AddCarrot(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		obj1.kill();
-		carrotCount += 1;
-		carrotNum.text = "Carrots: " + carrotCount;
-		add(carrotNum);
+		carrotCount++;
+		inventory.addCarrots(1);
+		carrotNum.text = "Carrots: " + inventory.carrots;
 	}
 
 	override public function update(elapsed:Float)
@@ -166,24 +175,33 @@ class Scene2 extends FlxState
 		// how do i save the carrot count for a different state to use?
 		// my glowing carrots aren't working...?
 
-		if (carrotCount == 0)
+		if (carrotCount == 0 && currentStage == 0)
 		{
 			ResetStage();
 			CarrotStage1();
+			currentStage = 1;
 		}
-		else if (carrotCount == 6)
+		else if (carrotCount == 6 && currentStage == 1)
 		{
 			ResetStage();
 			CarrotStage2();
+			currentStage = 2;
 		}
 		else if (carrotCount == 12)
 		{
 			ResetStage();
 			CarrotStage3();
+			currentStage = 3;
 		}
 		else if (carrotCount == 18)
 		{
 			ResetStage();
+			currentStage = 4;
+		}
+
+		// TEMP code to return to map:
+		if (FlxG.keys.justPressed.R) {
+			FlxG.switchState(new MapScene(inventory));
 		}
 
 		super.update(elapsed);
