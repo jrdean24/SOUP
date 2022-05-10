@@ -5,6 +5,7 @@ import flixel.FlxSprite;
 import flixel.FlxState;
 import item.Ingredient;
 
+// Soup Location
 class Scene1 extends FlxState
 {
 	var hero:character.Hero;

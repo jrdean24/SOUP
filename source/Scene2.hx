@@ -9,6 +9,7 @@ import flixel.text.FlxText;
 import item.Ingredient;
 import item.Wall;
 
+// Carrot Farm
 class Scene2 extends FlxState
 {
 	var hero:character.Hero;

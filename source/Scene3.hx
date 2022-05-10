@@ -9,6 +9,7 @@ import flixel.text.FlxText;
 import item.Ingredient;
 import item.Wall;
 
+// Potato Field
 class Scene3 extends FlxState
 {
 	var hero:character.Hero;

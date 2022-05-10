@@ -7,6 +7,7 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import item.Wall;
 
+// Milk Barn
 class Scene4 extends FlxState
 {
 	var hero:character.Hero;
