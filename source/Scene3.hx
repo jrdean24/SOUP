@@ -9,7 +9,7 @@ import flixel.text.FlxText;
 import item.Ingredient;
 import item.Wall;
 
-class Scene2 extends FlxState
+class Scene3 extends FlxState
 {
 	var hero:character.Hero;
 	var potatoes:FlxTypedGroup<item.Ingredient>;
@@ -24,11 +24,16 @@ class Scene2 extends FlxState
 	{
 		super.create();
 
+		// TODO: Add Walls Correctly
 		/*walls = new FlxTypedGroup<item.Wall>();
 			walls.add(new Wall(x, y, width, height));
 			add(walls); */
 
 		add(new FlxSprite(0, 0, "assets/images/potatoLocal.png"));
+
+		// TODO: Put Potatoes in correct places
+		// TODO: Replace pototo.png with one without a background
+		// TODO: Add Bushes
 
 		potatoes = new FlxTypedGroup<item.Ingredient>();
 		potatoes.add(new Ingredient(350, 450, potatoIcon));
