@@ -12,8 +12,7 @@ class Hero extends FlxSprite
 	{
 		super(x, y);
 
-		// load graphic later on
-		makeGraphic(40, 80, FlxColor.WHITE, false, "Hero");
+		loadGraphic("assets/images/heroSouth.png", false, 40, 67);
 	}
 
 	override public function update(elapsed:Float)
@@ -42,24 +41,28 @@ class Hero extends FlxSprite
 			{
 				velocity.x = -SPEED;
 				velocity.y = 0;
+				loadGraphic("assets/images/heroWest.png", false, 40, 67);
 			}
 
 			if (FlxG.keys.pressed.RIGHT)
 			{
 				velocity.x = SPEED;
 				velocity.y = 0;
+				loadGraphic("assets/images/heroEast.png", false, 40, 67);
 			}
 
 			if (FlxG.keys.pressed.UP)
 			{
 				velocity.y = -SPEED;
 				velocity.x = 0;
+				loadGraphic("assets/images/heroNorth.png", false, 40, 67);
 			}
 
 			if (FlxG.keys.pressed.DOWN)
 			{
 				velocity.y = SPEED;
 				velocity.x = 0;
+				loadGraphic("assets/images/heroSouth.png", false, 40, 67);
 			}
 
 			if (FlxG.keys.pressed.UP == false && FlxG.keys.pressed.DOWN == false && FlxG.keys.pressed.LEFT == false && FlxG.keys.pressed.RIGHT == false)

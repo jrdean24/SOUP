@@ -9,6 +9,6 @@ class Ingredient extends FlxSprite
 	{
 		super(x, y);
 
-		loadGraphic(GraphicName, false, 50, 50, false, "ingredient");
+		loadGraphic(GraphicName, false, 50, 50);
 	}
 }

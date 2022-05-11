@@ -1,5 +1,7 @@
 package;
 
+import flixel.FlxState;
+
 // Start Screen
 class Scene0 extends FlxState
 {
