@@ -115,8 +115,6 @@ class Scene2 extends FlxState
 
 	public function CarrotStage1()
 	{
-		carrots = new FlxTypedGroup<item.Ingredient>();
-		glowcarrots = new FlxTypedGroup<item.Ingredient>();
 		carrots.add(new Ingredient(350, 450, carrotTopPicture));
 		carrots.add(new Ingredient(450, 450, carrotTopPicture));
 		glowcarrots.add(new Ingredient(550, 450, glowingCarrotTopPicture));
@@ -138,8 +136,6 @@ class Scene2 extends FlxState
 
 	public function CarrotStage2()
 	{
-		carrots = new FlxTypedGroup<item.Ingredient>();
-		glowcarrots = new FlxTypedGroup<item.Ingredient>();
 		glowcarrots.add(new Ingredient(350, 450, glowingCarrotTopPicture));
 		carrots.add(new Ingredient(450, 450, carrotTopPicture));
 		carrots.add(new Ingredient(550, 450, carrotTopPicture));
@@ -161,8 +157,6 @@ class Scene2 extends FlxState
 
 	public function CarrotStage3()
 	{
-		carrots = new FlxTypedGroup<item.Ingredient>();
-		glowcarrots = new FlxTypedGroup<item.Ingredient>();
 		carrots.add(new Ingredient(350, 450, carrotTopPicture));
 		glowcarrots.add(new Ingredient(450, 450, glowingCarrotTopPicture));
 		carrots.add(new Ingredient(550, 450, carrotTopPicture));
@@ -189,8 +183,8 @@ class Scene2 extends FlxState
 
 	public function ResetStage()
 	{
-		carrots.kill();
-		glowcarrots.kill();
+		carrots.forEach((carrot:Ingredient) -> carrot.kill());
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.kill());
 	}
 
 	public function AddCarrot(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
