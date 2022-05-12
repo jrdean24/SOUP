@@ -3,7 +3,7 @@ package item;
 import flixel.FlxSprite;
 import flixel.util.FlxColor;
 
-class CowBox extends FlxSprite
+class BackgroundBox extends FlxSprite
 {
 	public function new(x:Float = 0, y:Float = 0, width:Int = 0, height:Int = 0)
 	{
