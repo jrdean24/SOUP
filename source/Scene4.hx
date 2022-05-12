@@ -9,6 +9,7 @@ import flixel.addons.ui.FlxButtonPlus;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import item.CowBox;
 import item.Wall;
 
 // Milk Barn
@@ -19,6 +20,7 @@ class Scene4 extends FlxState
 	var hero:character.Hero;
 	var milkCount:Int = 0;
 	var walls:FlxTypedGroup<item.Wall>;
+	var cows:FlxTypedGroup<item.CowBox>;
 	var returntoMap:FlxButtonPlus;
 	var inventoryDisplayBox:Wall;
 	var returnDisplayBox:Wall;
@@ -49,10 +51,14 @@ class Scene4 extends FlxState
 			walls.add(new Wall(x, y, width, height));
 			add(walls); */
 
+		cows = new FlxTypedGroup<item.CowBox>();
+		cows.add(new CowBox(525, 275, 250, 150));
+		cows.add(new CowBox(1000, 325, 250, 150));
+		cows.add(new CowBox(1200, 650, 100, 300));
+		add(cows);
+
 		add(new FlxSprite(0, 0, "assets/images/Cows.png"));
 
-		// TODO: Add Cows for interaction
-		// TODO: Mouse capabilites
 		// TODO: Location for putting pails when finished
 		// TODO: Logic for getting milk
 
