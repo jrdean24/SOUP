@@ -1,5 +1,6 @@
 package;
 
+import character.Hero;
 import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -13,13 +14,6 @@ class MapScene extends FlxState
 {
 	var inventory:Inventory;
 
-	var scene1Button:FlxButtonPlus;
-	var scene2Button:FlxButtonPlus;
-	var scene3Button:FlxButtonPlus;
-	var scene4Button:FlxButtonPlus;
-	var scene5Button:FlxButtonPlus;
-	var scene6Button:FlxButtonPlus;
-
 	var inventoryDisplayBox:Wall;
 	var carrotNum:FlxText;
 	var potatoNum:FlxText;
@@ -28,6 +22,7 @@ class MapScene extends FlxState
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var hero:character.Hero;
 
 	var scene1Graphic:FlxSprite;
 	var scene2Graphic:FlxSprite;
@@ -53,41 +48,27 @@ class MapScene extends FlxState
 	{
 		super.create();
 
-		/*scene1Graphic = new FlxSprite(0, 0);
-			scene1Graphic.loadGraphic("assets/images/Pot.png");
-			scene2Graphic = new FlxSprite(0, 0);
-			scene2Graphic.loadGraphic("assets/images/Carrot.png");
-			scene3Graphic = new FlxSprite(0, 0);
-			scene3Graphic.loadGraphic("assets/images/Potato.png");
-			scene4Graphic = new FlxSprite(0, 0);
-			scene4Graphic.loadGraphic("assets/images/milk.png");
-			scene5Graphic = new FlxSprite(0, 0);
-			scene5Graphic.loadGraphic("assets/images/onion.png");
-			scene6Graphic = new FlxSprite(0, 0);
-			scene6Graphic.loadGraphic("assets/images/redflower.png"); */
-
-		scene1Button = new FlxButtonPlus(100, 600, goToScene1, "Scene 1", 150, 150);
-		add(scene1Button);
-		scene2Button = new FlxButtonPlus(300, 600, goToScene2, "Scene 2", 150, 150);
-		add(scene2Button);
-		scene3Button = new FlxButtonPlus(500, 600, goToScene3, "Scene 3", 150, 150);
-		add(scene3Button);
-		scene4Button = new FlxButtonPlus(700, 600, goToScene4, "Scene 4", 150, 150);
-		add(scene4Button);
-		scene5Button = new FlxButtonPlus(900, 600, goToScene5, "Scene 5", 150, 150);
-		add(scene5Button);
-		scene6Button = new FlxButtonPlus(1100, 600, goToScene6, "Scene 6", 150, 150);
-		add(scene6Button);
-
-		/*scene1Button.loadButtonGraphic(scene1Graphic, scene1Graphic);
-			scene2Button.loadButtonGraphic(scene2Graphic, scene2Graphic);
-			scene3Button.loadButtonGraphic(scene3Graphic, scene3Graphic);
-			scene4Button.loadButtonGraphic(scene4Graphic, scene4Graphic);
-			scene5Button.loadButtonGraphic(scene5Graphic, scene5Graphic);
-			scene6Button.loadButtonGraphic(scene6Graphic, scene6Graphic); */
+		scene1Graphic = new FlxSprite(100, 700);
+		scene1Graphic.loadGraphic("assets/images/Pot.png", false, 150, 150);
+		scene2Graphic = new FlxSprite(300, 700);
+		scene2Graphic.loadGraphic("assets/images/Carrot.png", false, 150, 150);
+		scene3Graphic = new FlxSprite(500, 700);
+		scene3Graphic.loadGraphic("assets/images/Potato.png", false, 150, 150);
+		scene4Graphic = new FlxSprite(700, 700);
+		scene4Graphic.loadGraphic("assets/images/milk.png", false, 150, 150);
+		scene5Graphic = new FlxSprite(900, 700);
+		scene5Graphic.loadGraphic("assets/images/onion.png", false, 150, 150);
+		scene6Graphic = new FlxSprite(1100, 700);
+		scene6Graphic.loadGraphic("assets/images/redflower.png", false, 150, 150);
+		add(scene1Graphic);
+		add(scene2Graphic);
+		add(scene3Graphic);
+		add(scene4Graphic);
+		add(scene5Graphic);
+		add(scene6Graphic);
 
 		add(new FlxText(200, 500, 0, "Gather Ingredients, then return to Scene1.", 38));
-		add(new FlxText(250, 550, 0, "Click a Scene to go to that location", 38));
+		add(new FlxText(250, 550, 0, "Walk to a Scene to go to that location", 38));
 
 		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
 		inventoryDisplayBox.color = FlxColor.GRAY;
@@ -106,40 +87,50 @@ class MapScene extends FlxState
 		add(redFlowerNum);
 		add(yellowFlowerNum);
 		add(carrotNum);
+
+		hero = new Hero(50, 250);
+		add(hero);
 	}
 
-	private function goToScene1()
+	private function goToScene1(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		FlxG.switchState(new Scene1(inventory));
 	}
 
-	private function goToScene2()
+	private function goToScene2(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		FlxG.switchState(new Scene2(inventory));
 	}
 
-	private function goToScene3()
+	private function goToScene3(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		FlxG.switchState(new Scene3(inventory));
 	}
 
-	private function goToScene4()
+	private function goToScene4(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		FlxG.switchState(new Scene4(inventory));
 	}
 
-	private function goToScene5()
+	private function goToScene5(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		FlxG.switchState(new Scene5(inventory));
 	}
 
-	private function goToScene6()
+	private function goToScene6(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		FlxG.switchState(new Scene6(inventory));
 	}
 
 	override public function update(elapsed:Float)
 	{
+		FlxG.overlap(scene1Graphic, hero, goToScene1);
+		FlxG.overlap(scene2Graphic, hero, goToScene2);
+		FlxG.overlap(scene3Graphic, hero, goToScene3);
+		FlxG.overlap(scene4Graphic, hero, goToScene4);
+		FlxG.overlap(scene5Graphic, hero, goToScene5);
+		FlxG.overlap(scene6Graphic, hero, goToScene6);
+
 		super.update(elapsed);
 	}
 }

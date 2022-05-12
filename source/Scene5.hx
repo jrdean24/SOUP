@@ -13,6 +13,7 @@ class Scene5 extends FlxState
 {
 	var inventory:Inventory;
 	var returntoMap:FlxButtonPlus;
+	var returnDisplayBox:Wall;
 	var inventoryDisplayBox:Wall;
 	var carrotNum:FlxText;
 	var potatoNum:FlxText;
@@ -50,8 +51,10 @@ class Scene5 extends FlxState
 		add(yellowFlowerNum);
 		add(carrotNum);
 
-		returntoMap = new FlxButtonPlus(10, 10, backToMap, "Return to Map", 50, 50);
-		add(returntoMap);
+		returnDisplayBox = new Wall(0, 0, 400, 70);
+		returnDisplayBox.color = FlxColor.GRAY;
+		add(returnDisplayBox);
+		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
 	}
 
 	private function backToMap()
@@ -61,6 +64,11 @@ class Scene5 extends FlxState
 
 	override public function update(elapsed:Float)
 	{
+		if (FlxG.keys.justPressed.R)
+		{
+			FlxG.switchState(new MapScene(inventory));
+		}
+
 		super.update(elapsed);
 	}
 }
