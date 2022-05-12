@@ -10,6 +10,7 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import item.CowBox;
+import item.Ingredient;
 import item.Wall;
 
 // Milk Barn
@@ -21,6 +22,7 @@ class Scene4 extends FlxState
 	var milkCount:Int = 0;
 	var walls:FlxTypedGroup<item.Wall>;
 	var cows:FlxTypedGroup<item.CowBox>;
+	var pails:FlxTypedGroup<item.Ingredient>;
 	var returntoMap:FlxButtonPlus;
 	var inventoryDisplayBox:Wall;
 	var returnDisplayBox:Wall;
@@ -61,6 +63,11 @@ class Scene4 extends FlxState
 
 		// TODO: Location for putting pails when finished
 		// TODO: Logic for getting milk
+
+		pails = new FlxTypedGroup<item.Ingredient>();
+		pails.add(new Ingredient(275, 775, "assets/images/milkPail.png"));
+		pails.add(new Ingredient(400, 775, "assets/images/milkPail.png"));
+		add(pails);
 
 		hero = new Hero(50, 50);
 		add(hero);
