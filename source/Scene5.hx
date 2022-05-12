@@ -1,6 +1,8 @@
 package;
 
+import character.Hero;
 import character.Inventory;
+import character.NPC;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.addons.ui.FlxButtonPlus;
@@ -22,6 +24,9 @@ class Scene5 extends FlxState
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var onionGal:NPC;
+	var hero:Hero;
+	var checkoutCounterBox:Wall;
 
 	public function new(incomingInventory:Inventory)
 	{
@@ -32,6 +37,11 @@ class Scene5 extends FlxState
 	override public function create()
 	{
 		super.create();
+
+		onionGal = new NPC(700, 200, "assets/images/OnionGirl.png");
+		add(onionGal);
+		hero = new Hero(50, 50);
+		add(hero);
 
 		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
 		inventoryDisplayBox.color = FlxColor.GRAY;

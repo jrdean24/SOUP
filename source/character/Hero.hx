@@ -8,11 +8,11 @@ class Hero extends FlxSprite
 {
 	var SPEED:Int = 200;
 
-	public function new(x:Float = 0, y:Float = 0)
+	public function new(x:Float = 0, y:Float = 0, characterGraphic:String = "assets/images/heroSouth.png")
 	{
 		super(x, y);
 
-		loadGraphic("assets/images/heroSouth.png", false, 40, 67);
+		loadGraphic(characterGraphic, false, 40, 67);
 	}
 
 	override public function update(elapsed:Float)
