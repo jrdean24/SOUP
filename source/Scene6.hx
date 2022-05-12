@@ -1,11 +1,14 @@
 package;
 
+import character.Hero;
 import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.addons.ui.FlxButtonPlus;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import item.Ingredient;
 import item.Wall;
 
 // Flower Field
@@ -22,6 +25,11 @@ class Scene6 extends FlxState
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var hero:Hero;
+	var redFlowers:FlxTypedGroup<Ingredient>;
+	var yellowFlowers:FlxTypedGroup<Ingredient>;
+	var randomXLocation:Float = 0;
+	var randomYLocation:Float = 0;
 
 	public function new(incomingInventory:Inventory)
 	{
@@ -32,6 +40,25 @@ class Scene6 extends FlxState
 	override public function create()
 	{
 		super.create();
+
+		redFlowers = new FlxTypedGroup<Ingredient>();
+		for (i in 0...35)
+		{
+			randomizeLocation();
+			redFlowers.add(new Ingredient(randomXLocation, randomYLocation, "assets/images/redFlower.png"));
+		}
+		add(redFlowers);
+
+		yellowFlowers = new FlxTypedGroup<Ingredient>();
+		for (i in 0...100)
+		{
+			randomizeLocation();
+			yellowFlowers.add(new Ingredient(randomXLocation, randomYLocation, "assets/images/yellowFlower.png"));
+		}
+		add(yellowFlowers);
+
+		hero = new Hero(50, 50);
+		add(hero);
 
 		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
 		inventoryDisplayBox.color = FlxColor.GRAY;
@@ -62,8 +89,31 @@ class Scene6 extends FlxState
 		FlxG.switchState(new MapScene(inventory));
 	}
 
+	private function randomizeLocation()
+	{
+		randomXLocation = FlxG.random.float(100, 1300);
+		randomYLocation = FlxG.random.float(100, 900);
+	}
+
+	public function AddRedFlower(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		obj1.kill();
+		inventory.addRedFlowers(1);
+		redFlowerNum.text = "Red Flowers: " + inventory.redFlower;
+	}
+
+	public function AddYellowFlower(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		obj1.kill();
+		inventory.addYellowFlowers(1);
+		yellowFlowerNum.text = "Yellow Flowers: " + inventory.yellowFlower;
+	}
+
 	override public function update(elapsed:Float)
 	{
+		FlxG.overlap(redFlowers, hero, AddRedFlower);
+		FlxG.overlap(yellowFlowers, hero, AddYellowFlower);
+
 		if (FlxG.keys.justPressed.R)
 		{
 			FlxG.switchState(new MapScene(inventory));
