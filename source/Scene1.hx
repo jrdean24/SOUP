@@ -17,6 +17,7 @@ class Scene1 extends FlxState
 	var inventory:Inventory;
 
 	var inventoryDisplayBox:Wall;
+	var returnDisplayBox:Wall;
 	var carrotNum:FlxText;
 	var potatoNum:FlxText;
 	var onionNum:FlxText;
@@ -69,8 +70,10 @@ class Scene1 extends FlxState
 		add(yellowFlowerNum);
 		add(carrotNum);
 
-		returntoMap = new FlxButtonPlus(10, 10, backToMap, "Return to Map", 50, 50);
-		add(returntoMap);
+		returnDisplayBox = new Wall(0, 0, 400, 70);
+		returnDisplayBox.color = FlxColor.GRAY;
+		add(returnDisplayBox);
+		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
 
 		winScreenButton = new FlxButtonPlus(FlxG.width / 2, FlxG.height / 2, goToWinScreen, "FINISH", 50, 50);
 	}
@@ -90,6 +93,11 @@ class Scene1 extends FlxState
 		if (inventory.carrots >= 18)
 		{
 			add(winScreenButton);
+		}
+
+		if (FlxG.keys.justPressed.R)
+		{
+			FlxG.switchState(new MapScene(inventory));
 		}
 
 		super.update(elapsed);

@@ -9,6 +9,8 @@ import flixel.addons.ui.FlxButtonPlus;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import item.BackgroundBox;
+import item.Ingredient;
 import item.Wall;
 
 // Milk Barn
@@ -19,8 +21,12 @@ class Scene4 extends FlxState
 	var hero:character.Hero;
 	var milkCount:Int = 0;
 	var walls:FlxTypedGroup<item.Wall>;
+	var cows:FlxTypedGroup<item.BackgroundBox>;
+	var pail1:item.Ingredient;
+	var pail2:item.Ingredient;
 	var returntoMap:FlxButtonPlus;
 	var inventoryDisplayBox:Wall;
+	var returnDisplayBox:Wall;
 	var carrotNum:FlxText;
 	var potatoNum:FlxText;
 	var onionNum:FlxText;
@@ -28,6 +34,11 @@ class Scene4 extends FlxState
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var pailFillingBuffer1:Int = 200;
+	var pailFillingBuffer2:Int = 200;
+	var emptyBucket1:Bool = true;
+	var emptyBucket2:Bool = true;
+	var benchBox:item.BackgroundBox;
 
 	// name to put into load graphics
 	var emptyPail:String = "assets/images/milkPail.png";
@@ -48,25 +59,34 @@ class Scene4 extends FlxState
 			walls.add(new Wall(x, y, width, height));
 			add(walls); */
 
+		cows = new FlxTypedGroup<item.BackgroundBox>();
+		cows.add(new BackgroundBox(525, 275, 250, 150));
+		cows.add(new BackgroundBox(1000, 325, 250, 150));
+		cows.add(new BackgroundBox(1200, 650, 100, 300));
+		add(cows);
+
+		benchBox = new BackgroundBox(250, 750, 300, 200);
+		add(benchBox);
+
 		add(new FlxSprite(0, 0, "assets/images/Cows.png"));
 
-		// TODO: Add Cows for interaction
-		// TODO: Mouse capabilites
 		// TODO: Location for putting pails when finished
 		// TODO: Logic for getting milk
 
+		pail1 = new Ingredient(400, 600, "assets/images/milkPail.png");
+		pail2 = new Ingredient(650, 600, "assets/images/milkPail.png");
+		add(pail1);
+		add(pail2);
+
 		hero = new Hero(50, 50);
 		add(hero);
-
-		milkNum = new flixel.text.FlxText(0, 20, 0, "Milk Bottles: " + milkCount, 24, true);
-		add(milkNum);
 
 		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
 		inventoryDisplayBox.color = FlxColor.GRAY;
 		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
-		onionNum = new FlxText(1100, 80, 0, "Milk: " + inventory.milk, 24, true);
-		milkNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
+		milkNum = new FlxText(1100, 80, 0, "Milk Bottles: " + inventory.milk, 24, true);
+		onionNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
 		souperSpiceNum = new FlxText(1100, 140, 0, "Souper Spice: " + inventory.souperSpice, 24, true);
 		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
 		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
@@ -79,8 +99,10 @@ class Scene4 extends FlxState
 		add(yellowFlowerNum);
 		add(carrotNum);
 
-		returntoMap = new FlxButtonPlus(10, 10, backToMap, "Return to Map", 50, 50);
-		add(returntoMap);
+		returnDisplayBox = new Wall(0, 0, 400, 70);
+		returnDisplayBox.color = FlxColor.GRAY;
+		add(returnDisplayBox);
+		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
 	}
 
 	private function backToMap()
@@ -88,16 +110,57 @@ class Scene4 extends FlxState
 		FlxG.switchState(new MapScene(inventory));
 	}
 
-	public function AddCarrot(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	public function AddMilk(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		obj1.kill();
-		milkCount += 1;
-		milkNum.text = "Milk Bottles: " + milkCount;
-		add(milkNum);
+		milkCount += 2;
+		inventory.addMilk(2);
+		milkNum.text = "Milk Bottles: " + inventory.milk;
+	}
+
+	public function FillBucket1(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		pailFillingBuffer1--;
+	}
+
+	public function FillBucket2(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		pailFillingBuffer2--;
 	}
 
 	override public function update(elapsed:Float)
 	{
+		if (FlxG.keys.justPressed.R)
+		{
+			FlxG.switchState(new MapScene(inventory));
+		}
+
+		FlxG.overlap(cows, pail1, FillBucket1);
+		FlxG.overlap(cows, pail2, FillBucket2);
+		FlxG.collide(hero, pail1);
+		FlxG.collide(hero, pail2);
+
+		if (pailFillingBuffer1 == 0 && emptyBucket1)
+		{
+			pail1.loadGraphic("assets/images/fullMilkPail.png");
+			emptyBucket1 = false;
+		}
+
+		if (pailFillingBuffer2 == 0 && emptyBucket2)
+		{
+			pail2.loadGraphic("assets/images/fullMilkPail.png");
+			emptyBucket2 = false;
+		}
+
+		if (emptyBucket1 == false)
+		{
+			FlxG.overlap(pail1, benchBox, AddMilk);
+		}
+		if (emptyBucket2 == false)
+		{
+			FlxG.overlap(pail2, benchBox, AddMilk);
+		}
+
 		super.update(elapsed);
 	}
 }
