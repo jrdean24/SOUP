@@ -88,7 +88,7 @@ class Scene1 extends FlxState
 
 	private function goToWinScreen(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
-		FlxG.switchState(new Scene7());
+		FlxG.switchState(new Scene7(inventory));
 	}
 
 	override public function update(elapsed:Float)
