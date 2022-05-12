@@ -28,7 +28,8 @@ class Scene1 extends FlxState
 	var returntoMap:FlxButtonPlus;
 	var hero:character.Hero;
 	var pot:item.Ingredient;
-	var winScreenButton:FlxButtonPlus;
+	var winScreenSprite:Wall;
+	var backgroundSprite:FlxSprite;
 
 	public function new(incomingInventory:Inventory)
 	{
@@ -41,18 +42,22 @@ class Scene1 extends FlxState
 		super.create();
 
 		// TODO: Add Walls
+		winScreenSprite = new Wall(700, 500, 100, 100);
+		add(winScreenSprite);
 
-		add(new FlxSprite(0, 0, "assets/images/SoupLocation.png"));
+		backgroundSprite = new FlxSprite(0, 0, "assets/images/SoupLocation.png");
+		add(backgroundSprite);
 
 		pot = new Ingredient(655, 400, "assets/images/Pot.png");
 		add(pot);
 
-		add(new FlxText(400, 200, 0, "Total needed: 18 Carrots", 38));
+		add(new FlxText(100, 270, 1200, "Total needed: 18 Carrots, 17 Potatoes, 4 Bottles of Milk, 9 Onions, and 3 Parts Souper Spice", 20));
+		add(new FlxText(400, 200, 0, "Go to Pot to Make Soup", 38));
 
 		hero = new Hero(50, 50);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
+		inventoryDisplayBox = new Wall(1110, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;
 		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
@@ -74,8 +79,6 @@ class Scene1 extends FlxState
 		returnDisplayBox.color = FlxColor.GRAY;
 		add(returnDisplayBox);
 		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
-
-		winScreenButton = new FlxButtonPlus(FlxG.width / 2, FlxG.height / 2, goToWinScreen, "FINISH", 50, 50);
 	}
 
 	private function backToMap()
@@ -83,17 +86,14 @@ class Scene1 extends FlxState
 		FlxG.switchState(new MapScene(inventory));
 	}
 
-	private function goToWinScreen()
+	private function goToWinScreen(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
-		FlxG.switchState(new Scene7());
+		FlxG.switchState(new Scene7(inventory));
 	}
 
 	override public function update(elapsed:Float)
 	{
-		if (inventory.carrots >= 18)
-		{
-			add(winScreenButton);
-		}
+		FlxG.overlap(winScreenSprite, hero, goToWinScreen);
 
 		if (FlxG.keys.justPressed.R)
 		{
