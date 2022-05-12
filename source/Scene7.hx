@@ -76,7 +76,7 @@ class Scene7 extends FlxState
 			add(new FlxText(200, 200, 0, "COMPLETED 100%!", 32));
 			add(new FlxText(200, 300, 0, "You are a Souper Chef!", 32));
 		}
-		if (totalPts > 0 && totalPts < 6)
+		if (totalPts > 0 && totalPts < 5)
 		{
 			add(new FlxText(200, 200, 0, "The Legendary Soup is somewhat complete...", 32));
 			add(new FlxText(200, 300, 0, "You are a somewhat decent chef, we suppose...", 32));
