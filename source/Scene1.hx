@@ -46,11 +46,16 @@ class Scene1 extends FlxState
 		walls = new FlxTypedGroup<item.Wall>();
 		walls.add(new Wall(0, 0, 1400, 1)); // top border
 		walls.add(new Wall(0, 0, 1, 1000)); // east border
-		walls.add(new Wall(1400, 0, 1400, 1)); // bottom border
-		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
+		walls.add(new Wall(0, 900, 1400, 100)); // bottom border
+		walls.add(new Wall(1300, 0, 100, 1000)); // west Border
+		walls.add(new Wall(0, 20, 70, 150)); // top tree
+		walls.add(new Wall(820, 900, 200, 100)); // Bottom tree
+		walls.add(new Wall(650, 360, 100, 20)); // top log
+		walls.add(new Wall(540, 500, 30, 80)); // west log
+		walls.add(new Wall(840, 500, 30, 80)); // east log
 		add(walls);
 
-		winScreenSprite = new Wall(700, 500, 100, 100);
+		winScreenSprite = new Wall(690, 400, 100, 100);
 		add(winScreenSprite);
 
 		backgroundSprite = new FlxSprite(0, 0, "assets/images/SoupLocation.png");
@@ -62,7 +67,7 @@ class Scene1 extends FlxState
 		add(new FlxText(100, 270, 1200, "Total needed: 18 Carrots, 17 Potatoes, 4 Bottles of Milk, 9 Onions, and 3 Parts Souper Spice", 20));
 		add(new FlxText(400, 200, 0, "Go to Pot to Make Soup", 38));
 
-		hero = new Hero(50, 50);
+		hero = new Hero(50, 200);
 		add(hero);
 
 		inventoryDisplayBox = new Wall(1090, 0, 300, 250);

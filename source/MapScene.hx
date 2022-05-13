@@ -76,8 +76,8 @@ class MapScene extends FlxState
 		add(scene5Graphic);
 		add(scene6Graphic);
 
-		add(new FlxText(200, 500, 0, "Gather Ingredients, then return to Scene1.", 38));
-		add(new FlxText(250, 550, 0, "Walk to a Scene to go to that location", 38));
+		add(new FlxText(200, 500, 0, "Gather Ingredients, then return to Campfire.", 38));
+		add(new FlxText(250, 550, 0, "Walk to a Location to go to there", 38));
 
 		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;

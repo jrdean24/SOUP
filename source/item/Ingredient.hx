@@ -14,23 +14,6 @@ class Ingredient extends FlxSprite
 
 	override public function update(elapsed:Float)
 	{
-		if (x < 0)
-		{
-			velocity.x = 300;
-		}
-		else if (x > FlxG.width - width)
-		{
-			velocity.x = -300;
-		}
-		else if (y < 0)
-		{
-			velocity.y = 300;
-		}
-		else if (y > FlxG.height - height)
-		{
-			velocity.y = -300;
-		}
-
 		super.update(elapsed);
 	}
 }

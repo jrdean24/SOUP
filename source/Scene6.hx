@@ -45,8 +45,8 @@ class Scene6 extends FlxState
 		walls = new FlxTypedGroup<item.Wall>();
 		walls.add(new Wall(0, 0, 1400, 1)); // top border
 		walls.add(new Wall(0, 0, 1, 1000)); // east border
-		walls.add(new Wall(1400, 0, 1400, 1)); // bottom border
-		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
+		walls.add(new Wall(0, 900, 1400, 100)); // bottom border
+		walls.add(new Wall(1300, 0, 100, 1000)); // west Border
 		add(walls);
 
 		redFlowers = new FlxTypedGroup<Ingredient>();

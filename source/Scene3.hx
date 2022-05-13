@@ -56,10 +56,11 @@ class Scene3 extends FlxState
 		super.create();
 
 		walls = new FlxTypedGroup<item.Wall>();
-		walls.add(new Wall(0, 0, 1400, 1)); // top border
-		walls.add(new Wall(0, 0, 1, 1000)); // east border
-		walls.add(new Wall(1400, 0, 1400, 1)); // bottom border
-		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
+		walls.add(new Wall(0, 0, 1400, 100)); // top border
+		walls.add(new Wall(0, 0, 100, 1000)); // east border
+		walls.add(new Wall(0, 900, 1400, 100)); // bottom border
+		walls.add(new Wall(1300, 0, 100, 1000)); // west Border
+		walls.add(new Wall(850, 900, 600, 100)); // bottom border pt2
 		add(walls);
 
 		add(new FlxSprite(0, 0, "assets/images/Potato_Field.png"));
@@ -98,7 +99,7 @@ class Scene3 extends FlxState
 		bushes.add(new Bush(230, 648, bush2));
 		add(bushes);
 
-		hero = new Hero(50, 50);
+		hero = new Hero(650, 850);
 		add(hero);
 
 		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
