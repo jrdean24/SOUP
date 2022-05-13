@@ -5,7 +5,6 @@ import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.ui.FlxButtonPlus;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
@@ -17,17 +16,16 @@ class Scene2 extends FlxState
 {
 	var inventory:Inventory;
 
-	var inventoryDisplayBox:Wall;
-	var returnDisplayBox:Wall;
 	var carrotNum:FlxText;
 	var potatoNum:FlxText;
-	var onionNum:FlxText;
 	var milkNum:FlxText;
+	var onionNum:FlxText;
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var inventoryDisplayBox:Wall;
+	var returnDisplayBox:Wall;
 
-	var returntoMap:FlxButtonPlus;
 	var hero:character.Hero;
 	var carrots:FlxTypedGroup<item.Ingredient>;
 	var glowcarrots:FlxTypedGroup<item.Ingredient>;
@@ -55,7 +53,7 @@ class Scene2 extends FlxState
 		walls.add(new Wall(120, 140, 600, 80)); // top fence
 		walls.add(new Wall(0, 0, 130, 200)); // top tree
 		walls.add(new Wall(710, 0, FlxG.width - 710, 225)); // house1
-		walls.add(new Wall(820, 195, FlxG.width - 770, 80)); // house2
+		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
 		walls.add(new Wall(970, 250, 500, 200)); // hosue3
 		walls.add(new Wall(1350, 750, 50, 150)); // bush
 		walls.add(new Wall(130, 360, 30, 600)); // side fence
@@ -92,23 +90,23 @@ class Scene2 extends FlxState
 		hero = new Hero(50, 250);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
+		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;
 		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
-		onionNum = new FlxText(1100, 80, 0, "Milk: " + inventory.milk, 24, true);
-		milkNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
+		milkNum = new FlxText(1100, 80, 0, "Milk Bottle: " + inventory.milk, 24, true);
+		onionNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
 		souperSpiceNum = new FlxText(1100, 140, 0, "Souper Spice: " + inventory.souperSpice, 24, true);
 		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
 		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
 		add(inventoryDisplayBox);
+		add(carrotNum);
 		add(potatoNum);
-		add(onionNum);
 		add(milkNum);
+		add(onionNum);
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-		add(carrotNum);
 
 		returnDisplayBox = new Wall(0, 0, 400, 70);
 		returnDisplayBox.color = FlxColor.GRAY;

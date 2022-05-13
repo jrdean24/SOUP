@@ -5,7 +5,7 @@ import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.ui.FlxButtonPlus;
+import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import item.Wall;
@@ -14,15 +14,17 @@ class MapScene extends FlxState
 {
 	var inventory:Inventory;
 
-	var inventoryDisplayBox:Wall;
 	var carrotNum:FlxText;
 	var potatoNum:FlxText;
-	var onionNum:FlxText;
 	var milkNum:FlxText;
+	var onionNum:FlxText;
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var inventoryDisplayBox:Wall;
+
 	var hero:character.Hero;
+	var walls:FlxTypedGroup<item.Wall>;
 
 	var scene1Graphic:FlxSprite;
 	var scene2Graphic:FlxSprite;
@@ -48,6 +50,13 @@ class MapScene extends FlxState
 	{
 		super.create();
 
+		walls = new FlxTypedGroup<item.Wall>();
+		walls.add(new Wall(0, 0, 1400, 1)); // top border
+		walls.add(new Wall(0, 0, 1, 1000)); // east border
+		walls.add(new Wall(1400, 0, 1, 1000)); // bottom border
+		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
+		add(walls);
+
 		scene1Graphic = new FlxSprite(100, 700);
 		scene1Graphic.loadGraphic("assets/images/Pot.png", false, 150, 150);
 		scene2Graphic = new FlxSprite(300, 700);
@@ -67,26 +76,26 @@ class MapScene extends FlxState
 		add(scene5Graphic);
 		add(scene6Graphic);
 
-		add(new FlxText(200, 500, 0, "Gather Ingredients, then return to Scene1.", 38));
-		add(new FlxText(250, 550, 0, "Walk to a Scene to go to that location", 38));
+		add(new FlxText(200, 500, 0, "Gather Ingredients, then return to Campfire.", 38));
+		add(new FlxText(250, 550, 0, "Walk to a Location to go to there", 38));
 
-		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
+		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;
 		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
-		onionNum = new FlxText(1100, 80, 0, "Milk: " + inventory.milk, 24, true);
-		milkNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
+		milkNum = new FlxText(1100, 80, 0, "Milk Bottle: " + inventory.milk, 24, true);
+		onionNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
 		souperSpiceNum = new FlxText(1100, 140, 0, "Souper Spice: " + inventory.souperSpice, 24, true);
 		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
 		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
 		add(inventoryDisplayBox);
+		add(carrotNum);
 		add(potatoNum);
-		add(onionNum);
 		add(milkNum);
+		add(onionNum);
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-		add(carrotNum);
 
 		hero = new Hero(50, 250);
 		add(hero);
@@ -130,6 +139,7 @@ class MapScene extends FlxState
 		FlxG.overlap(scene4Graphic, hero, goToScene4);
 		FlxG.overlap(scene5Graphic, hero, goToScene5);
 		FlxG.overlap(scene6Graphic, hero, goToScene6);
+		FlxG.collide(hero, walls);
 
 		super.update(elapsed);
 	}

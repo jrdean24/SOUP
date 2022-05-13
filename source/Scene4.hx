@@ -5,7 +5,6 @@ import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.ui.FlxButtonPlus;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
@@ -18,22 +17,23 @@ class Scene4 extends FlxState
 {
 	var inventory:Inventory;
 
-	var hero:character.Hero;
-	var milkCount:Int = 0;
-	var walls:FlxTypedGroup<item.Wall>;
-	var cows:FlxTypedGroup<item.BackgroundBox>;
-	var pail1:item.Ingredient;
-	var pail2:item.Ingredient;
-	var returntoMap:FlxButtonPlus;
-	var inventoryDisplayBox:Wall;
-	var returnDisplayBox:Wall;
 	var carrotNum:FlxText;
 	var potatoNum:FlxText;
-	var onionNum:FlxText;
 	var milkNum:FlxText;
+	var onionNum:FlxText;
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var inventoryDisplayBox:Wall;
+	var returnDisplayBox:Wall;
+
+	var hero:character.Hero;
+	var milkCount:Int = 0;
+	var walls:FlxTypedGroup<item.Wall>;
+	var wallForPail:FlxTypedGroup<item.Wall>;
+	var cows:FlxTypedGroup<item.BackgroundBox>;
+	var pail1:item.Ingredient;
+	var pail2:item.Ingredient;
 	var pailFillingBuffer1:Int = 200;
 	var pailFillingBuffer2:Int = 200;
 	var emptyBucket1:Bool = true;
@@ -54,10 +54,21 @@ class Scene4 extends FlxState
 	{
 		super.create();
 
-		// TODO: Add Walls Correctly
-		/*walls = new FlxTypedGroup<item.Wall>();
-			walls.add(new Wall(x, y, width, height));
-			add(walls); */
+		walls = new FlxTypedGroup<item.Wall>();
+		walls.add(new Wall(0, 0, 1400, 250)); // top border
+		walls.add(new Wall(0, 0, 10, 1000)); // east border
+		walls.add(new Wall(0, 990, 1400, 10)); // bottom border
+		walls.add(new Wall(1390, 0, 10, 1000)); // west Border
+		walls.add(new Wall(100, 200, 200, 200)); // hay bale
+		add(walls);
+
+		wallForPail = new FlxTypedGroup<item.Wall>();
+		wallForPail.add(new Wall(0, 0, 1400, 400)); // top border
+		wallForPail.add(new Wall(0, 0, 110, 1000)); // east border
+		wallForPail.add(new Wall(0, 840, 1400, 160)); // bottom border
+		wallForPail.add(new Wall(1290, 0, 110, 1000)); // west Border
+		wallForPail.add(new Wall(100, 200, 350, 350)); // hay bale
+		add(wallForPail);
 
 		cows = new FlxTypedGroup<item.BackgroundBox>();
 		cows.add(new BackgroundBox(525, 275, 250, 150));
@@ -65,23 +76,20 @@ class Scene4 extends FlxState
 		cows.add(new BackgroundBox(1200, 650, 100, 300));
 		add(cows);
 
-		benchBox = new BackgroundBox(250, 750, 300, 200);
+		benchBox = new BackgroundBox(300, 830, 200, 200);
 		add(benchBox);
 
 		add(new FlxSprite(0, 0, "assets/images/Cows.png"));
-
-		// TODO: Location for putting pails when finished
-		// TODO: Logic for getting milk
 
 		pail1 = new Ingredient(400, 600, "assets/images/milkPail.png");
 		pail2 = new Ingredient(650, 600, "assets/images/milkPail.png");
 		add(pail1);
 		add(pail2);
 
-		hero = new Hero(50, 50);
+		hero = new Hero(50, 500);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
+		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;
 		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
@@ -91,13 +99,13 @@ class Scene4 extends FlxState
 		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
 		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
 		add(inventoryDisplayBox);
+		add(carrotNum);
 		add(potatoNum);
-		add(onionNum);
 		add(milkNum);
+		add(onionNum);
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-		add(carrotNum);
 
 		returnDisplayBox = new Wall(0, 0, 400, 70);
 		returnDisplayBox.color = FlxColor.GRAY;
@@ -139,6 +147,9 @@ class Scene4 extends FlxState
 		FlxG.overlap(cows, pail2, FillBucket2);
 		FlxG.collide(hero, pail1);
 		FlxG.collide(hero, pail2);
+		FlxG.collide(hero, walls);
+		FlxG.collide(pail1, wallForPail);
+		FlxG.collide(pail2, wallForPail);
 
 		if (pailFillingBuffer1 == 0 && emptyBucket1)
 		{

@@ -1,7 +1,6 @@
 package item;
 
 import flixel.FlxSprite;
-import flixel.util.FlxColor;
 
 class Wall extends FlxSprite
 {
