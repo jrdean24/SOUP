@@ -2,7 +2,6 @@ package character;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.util.FlxColor;
 
 class Hero extends FlxSprite
 {
@@ -11,7 +10,6 @@ class Hero extends FlxSprite
 	public function new(x:Float = 0, y:Float = 0, characterGraphic:String = "assets/images/heroSouth.png")
 	{
 		super(x, y);
-
 		loadGraphic(characterGraphic, false, 40, 67);
 	}
 
@@ -71,7 +69,6 @@ class Hero extends FlxSprite
 				velocity.x = 0;
 			}
 		}
-
 		super.update(elapsed);
 	}
 }

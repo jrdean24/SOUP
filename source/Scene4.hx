@@ -5,7 +5,6 @@ import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.ui.FlxButtonPlus;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
@@ -18,22 +17,22 @@ class Scene4 extends FlxState
 {
 	var inventory:Inventory;
 
+	var carrotNum:FlxText;
+	var potatoNum:FlxText;
+	var milkNum:FlxText;
+	var onionNum:FlxText;
+	var souperSpiceNum:FlxText;
+	var redFlowerNum:FlxText;
+	var yellowFlowerNum:FlxText;
+	var inventoryDisplayBox:Wall;
+	var returnDisplayBox:Wall;
+
 	var hero:character.Hero;
 	var milkCount:Int = 0;
 	var walls:FlxTypedGroup<item.Wall>;
 	var cows:FlxTypedGroup<item.BackgroundBox>;
 	var pail1:item.Ingredient;
 	var pail2:item.Ingredient;
-	var returntoMap:FlxButtonPlus;
-	var inventoryDisplayBox:Wall;
-	var returnDisplayBox:Wall;
-	var carrotNum:FlxText;
-	var potatoNum:FlxText;
-	var onionNum:FlxText;
-	var milkNum:FlxText;
-	var souperSpiceNum:FlxText;
-	var redFlowerNum:FlxText;
-	var yellowFlowerNum:FlxText;
 	var pailFillingBuffer1:Int = 200;
 	var pailFillingBuffer2:Int = 200;
 	var emptyBucket1:Bool = true;
@@ -54,10 +53,12 @@ class Scene4 extends FlxState
 	{
 		super.create();
 
-		// TODO: Add Walls Correctly
-		/*walls = new FlxTypedGroup<item.Wall>();
-			walls.add(new Wall(x, y, width, height));
-			add(walls); */
+		walls = new FlxTypedGroup<item.Wall>();
+		walls.add(new Wall(0, 0, 1400, 1)); // top border
+		walls.add(new Wall(0, 0, 1, 1000)); // east border
+		walls.add(new Wall(1400, 0, 1400, 1)); // bottom border
+		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
+		add(walls);
 
 		cows = new FlxTypedGroup<item.BackgroundBox>();
 		cows.add(new BackgroundBox(525, 275, 250, 150));
@@ -70,9 +71,6 @@ class Scene4 extends FlxState
 
 		add(new FlxSprite(0, 0, "assets/images/Cows.png"));
 
-		// TODO: Location for putting pails when finished
-		// TODO: Logic for getting milk
-
 		pail1 = new Ingredient(400, 600, "assets/images/milkPail.png");
 		pail2 = new Ingredient(650, 600, "assets/images/milkPail.png");
 		add(pail1);
@@ -81,7 +79,7 @@ class Scene4 extends FlxState
 		hero = new Hero(50, 50);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
+		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;
 		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
@@ -91,13 +89,13 @@ class Scene4 extends FlxState
 		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
 		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
 		add(inventoryDisplayBox);
+		add(carrotNum);
 		add(potatoNum);
-		add(onionNum);
 		add(milkNum);
+		add(onionNum);
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-		add(carrotNum);
 
 		returnDisplayBox = new Wall(0, 0, 400, 70);
 		returnDisplayBox.color = FlxColor.GRAY;
@@ -139,6 +137,7 @@ class Scene4 extends FlxState
 		FlxG.overlap(cows, pail2, FillBucket2);
 		FlxG.collide(hero, pail1);
 		FlxG.collide(hero, pail2);
+		FlxG.collide(hero, walls);
 
 		if (pailFillingBuffer1 == 0 && emptyBucket1)
 		{

@@ -5,7 +5,6 @@ import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.addons.ui.FlxButtonPlus;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
@@ -16,23 +15,26 @@ import item.Wall;
 // Potato Field
 class Scene3 extends FlxState
 {
+	// inventory
 	var inventory:Inventory;
 
+	// inventory and return instructions display
+	var carrotNum:FlxText;
+	var potatoNum:FlxText;
+	var milkNum:FlxText;
+	var onionNum:FlxText;
+	var souperSpiceNum:FlxText;
+	var redFlowerNum:FlxText;
+	var yellowFlowerNum:FlxText;
+	var inventoryDisplayBox:Wall;
+	var returnDisplayBox:Wall;
+
+	// class variables
 	var hero:character.Hero;
 	var potatoes:FlxTypedGroup<item.Ingredient>;
 	var bushes:FlxTypedGroup<item.Bush>;
 	var potatoCount:Int = 0;
 	var walls:FlxTypedGroup<item.Wall>;
-	var returntoMap:FlxButtonPlus;
-	var inventoryDisplayBox:Wall;
-	var returnDisplayBox:Wall;
-	var carrotNum:FlxText;
-	var potatoNum:FlxText;
-	var onionNum:FlxText;
-	var milkNum:FlxText;
-	var souperSpiceNum:FlxText;
-	var redFlowerNum:FlxText;
-	var yellowFlowerNum:FlxText;
 
 	// name to put into load graphics
 	var potatoIcon:String = "assets/images/Potato.png";
@@ -48,10 +50,12 @@ class Scene3 extends FlxState
 	{
 		super.create();
 
-		// TODO: Add Walls Correctly
-		/*walls = new FlxTypedGroup<item.Wall>();
-			walls.add(new Wall(x, y, width, height));
-			add(walls); */
+		walls = new FlxTypedGroup<item.Wall>();
+		walls.add(new Wall(0, 0, 1400, 1)); // top border
+		walls.add(new Wall(0, 0, 1, 1000)); // east border
+		walls.add(new Wall(1400, 0, 1400, 1)); // bottom border
+		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
+		add(walls);
 
 		add(new FlxSprite(0, 0, "assets/images/potatoLocal.png"));
 
@@ -90,23 +94,23 @@ class Scene3 extends FlxState
 		hero = new Hero(50, 50);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
+		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;
 		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
-		onionNum = new FlxText(1100, 80, 0, "Milk: " + inventory.milk, 24, true);
-		milkNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
+		milkNum = new FlxText(1100, 80, 0, "Milk Bottle: " + inventory.milk, 24, true);
+		onionNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
 		souperSpiceNum = new FlxText(1100, 140, 0, "Souper Spice: " + inventory.souperSpice, 24, true);
 		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
 		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
 		add(inventoryDisplayBox);
+		add(carrotNum);
 		add(potatoNum);
-		add(onionNum);
 		add(milkNum);
+		add(onionNum);
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-		add(carrotNum);
 
 		returnDisplayBox = new Wall(0, 0, 400, 70);
 		returnDisplayBox.color = FlxColor.GRAY;
@@ -130,6 +134,7 @@ class Scene3 extends FlxState
 	override public function update(elapsed:Float)
 	{
 		FlxG.overlap(potatoes, hero, AddPotato);
+		FlxG.collide(hero, walls);
 
 		if (FlxG.keys.justPressed.R)
 		{

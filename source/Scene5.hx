@@ -5,7 +5,7 @@ import character.Inventory;
 import character.NPC;
 import flixel.FlxG;
 import flixel.FlxState;
-import flixel.addons.ui.FlxButtonPlus;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import item.Ingredient;
@@ -15,22 +15,25 @@ import item.Wall;
 class Scene5 extends FlxState
 {
 	var inventory:Inventory;
-	var returntoMap:FlxButtonPlus;
-	var returnDisplayBox:Wall;
-	var inventoryDisplayBox:Wall;
+
 	var carrotNum:FlxText;
 	var potatoNum:FlxText;
-	var onionNum:FlxText;
 	var milkNum:FlxText;
+	var onionNum:FlxText;
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
-	var onionGal:NPC;
+	var returnDisplayBox:Wall;
+	var inventoryDisplayBox:Wall;
+
 	var hero:Hero;
+	var onionGal:NPC;
 	var checkoutCounterBox:Wall;
 	var talkBox:Wall;
 	var yellowFlowerTrade:Ingredient;
 	var redFlowerTrade:Ingredient;
+	var walls:FlxTypedGroup<Wall>;
+
 	var beginConversationText:FlxText;
 	var dia1:FlxText;
 	var dia2:FlxText;
@@ -47,6 +50,13 @@ class Scene5 extends FlxState
 	override public function create()
 	{
 		super.create();
+
+		walls = new FlxTypedGroup<item.Wall>();
+		walls.add(new Wall(0, 0, 1400, 1)); // top border
+		walls.add(new Wall(0, 0, 1, 1000)); // east border
+		walls.add(new Wall(1400, 0, 1400, 1)); // bottom border
+		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
+		add(walls);
 
 		checkoutCounterBox = new Wall(600, 0, 500, 400);
 		add(checkoutCounterBox);
@@ -67,23 +77,23 @@ class Scene5 extends FlxState
 		hero = new Hero(50, 50);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1100, 0, 300, 300);
+		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;
 		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
 		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
-		onionNum = new FlxText(1100, 80, 0, "Milk: " + inventory.milk, 24, true);
-		milkNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
+		milkNum = new FlxText(1100, 80, 0, "Milk Bottle: " + inventory.milk, 24, true);
+		onionNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
 		souperSpiceNum = new FlxText(1100, 140, 0, "Souper Spice: " + inventory.souperSpice, 24, true);
 		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
 		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
 		add(inventoryDisplayBox);
+		add(carrotNum);
 		add(potatoNum);
-		add(onionNum);
 		add(milkNum);
+		add(onionNum);
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-		add(carrotNum);
 
 		returnDisplayBox = new Wall(0, 0, 400, 70);
 		returnDisplayBox.color = FlxColor.GRAY;
@@ -154,6 +164,7 @@ class Scene5 extends FlxState
 		FlxG.collide(hero, checkoutCounterBox);
 		FlxG.overlap(redFlowerTrade, hero, RedFlowerForOnion);
 		FlxG.overlap(yellowFlowerTrade, hero, YellowFlowerForSouperSpice);
+		FlxG.collide(hero, walls);
 
 		if (FlxG.keys.justReleased.R)
 		{
