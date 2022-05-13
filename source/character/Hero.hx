@@ -11,10 +11,10 @@ class Hero extends FlxSprite
 	{
 		super(x, y);
 		loadGraphic("assets/images/heroSouth.png");
-		width = 60;
-		height = 120;
-		offset.x = 10;
-		offset.y = 8;
+		width = 45;
+		height = 90;
+		offset.x = 20;
+		offset.y = 30;
 	}
 
 	override public function update(elapsed:Float)
@@ -24,10 +24,10 @@ class Hero extends FlxSprite
 			velocity.x = -SPEED;
 			velocity.y = 0;
 			loadGraphic("assets/images/heroWest.png", false, 40, 67);
-			width = 40;
-			height = 120;
-			offset.x = 20;
-			offset.y = 8;
+			width = 30;
+			height = 90;
+			offset.x = 30;
+			offset.y = 30;
 		}
 
 		if (FlxG.keys.pressed.RIGHT)
@@ -35,10 +35,10 @@ class Hero extends FlxSprite
 			velocity.x = SPEED;
 			velocity.y = 0;
 			loadGraphic("assets/images/heroEast.png", false, 40, 67);
-			width = 40;
-			height = 120;
+			width = 30;
+			height = 90;
 			offset.x = 20;
-			offset.y = 8;
+			offset.y = 30;
 		}
 
 		if (FlxG.keys.pressed.UP)
@@ -46,10 +46,10 @@ class Hero extends FlxSprite
 			velocity.y = -SPEED;
 			velocity.x = 0;
 			loadGraphic("assets/images/heroNorth.png", false, 40, 67);
-			width = 60;
-			height = 120;
-			offset.x = 10;
-			offset.y = 8;
+			width = 45;
+			height = 90;
+			offset.x = 20;
+			offset.y = 30;
 		}
 
 		if (FlxG.keys.pressed.DOWN)
@@ -57,10 +57,10 @@ class Hero extends FlxSprite
 			velocity.y = SPEED;
 			velocity.x = 0;
 			loadGraphic("assets/images/heroSouth.png", false, 40, 67);
-			width = 60;
-			height = 120;
-			offset.x = 10;
-			offset.y = 8;
+			width = 45;
+			height = 90;
+			offset.x = 20;
+			offset.y = 30;
 		}
 
 		if (FlxG.keys.pressed.UP == false && FlxG.keys.pressed.DOWN == false && FlxG.keys.pressed.LEFT == false && FlxG.keys.pressed.RIGHT == false)

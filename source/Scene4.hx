@@ -83,12 +83,12 @@ class Scene4 extends FlxState
 
 		pail1 = new Ingredient(400, 600, "assets/images/milkPail.png");
 		pail2 = new Ingredient(650, 600, "assets/images/milkPail.png");
-		pail1.width = 80;
-		pail1.height = 100;
+		pail1.width = 60;
+		pail1.height = 80;
 		pail1.offset.x = 25;
 		pail1.offset.y = 5;
-		pail2.width = 80;
-		pail2.height = 100;
+		pail2.width = 60;
+		pail2.height = 80;
 		pail2.offset.x = 25;
 		pail2.offset.y = 5;
 		add(pail1);
@@ -163,12 +163,20 @@ class Scene4 extends FlxState
 		{
 			pail1.loadGraphic("assets/images/fullMilkPail.png");
 			emptyBucket1 = false;
+			pail1.width = 60;
+			pail1.height = 80;
+			pail1.offset.x = 25;
+			pail1.offset.y = 5;
 		}
 
 		if (pailFillingBuffer2 == 0 && emptyBucket2)
 		{
 			pail2.loadGraphic("assets/images/fullMilkPail.png");
 			emptyBucket2 = false;
+			pail2.width = 60;
+			pail2.height = 80;
+			pail2.offset.x = 25;
+			pail2.offset.y = 5;
 		}
 
 		if (emptyBucket1 == false)
