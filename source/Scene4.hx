@@ -83,6 +83,14 @@ class Scene4 extends FlxState
 
 		pail1 = new Ingredient(400, 600, "assets/images/milkPail.png");
 		pail2 = new Ingredient(650, 600, "assets/images/milkPail.png");
+		pail1.width = 80;
+		pail1.height = 100;
+		pail1.offset.x = 25;
+		pail1.offset.y = 5;
+		pail2.width = 80;
+		pail2.height = 100;
+		pail2.offset.x = 25;
+		pail2.offset.y = 5;
 		add(pail1);
 		add(pail2);
 

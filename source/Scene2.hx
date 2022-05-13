@@ -87,6 +87,15 @@ class Scene2 extends FlxState
 		add(carrots);
 		add(glowcarrots);
 
+		carrots.forEach((carrot:Ingredient) -> carrot.width = 75);
+		carrots.forEach((carrot:Ingredient) -> carrot.height = 75);
+		carrots.forEach((carrot:Ingredient) -> carrot.offset.x = 12);
+		carrots.forEach((carrot:Ingredient) -> carrot.offset.y = 12);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.width = 75);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.height = 75);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.x = 12);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.y = 12);
+
 		hero = new Hero(50, 250);
 		add(hero);
 
@@ -133,6 +142,15 @@ class Scene2 extends FlxState
 		glowcarrots.add(new Ingredient(750, 750, glowingCarrotTopPicture));
 		add(carrots);
 		add(glowcarrots);
+
+		carrots.forEach((carrot:Ingredient) -> carrot.width = 75);
+		carrots.forEach((carrot:Ingredient) -> carrot.height = 75);
+		carrots.forEach((carrot:Ingredient) -> carrot.offset.x = 12);
+		carrots.forEach((carrot:Ingredient) -> carrot.offset.y = 12);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.width = 75);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.height = 75);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.x = 12);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.y = 12);
 	}
 
 	public function CarrotStage2()
@@ -154,6 +172,15 @@ class Scene2 extends FlxState
 		carrots.add(new Ingredient(750, 750, carrotTopPicture));
 		add(carrots);
 		add(glowcarrots);
+
+		carrots.forEach((carrot:Ingredient) -> carrot.width = 75);
+		carrots.forEach((carrot:Ingredient) -> carrot.height = 75);
+		carrots.forEach((carrot:Ingredient) -> carrot.offset.x = 12);
+		carrots.forEach((carrot:Ingredient) -> carrot.offset.y = 12);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.width = 75);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.height = 75);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.x = 12);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.y = 12);
 	}
 
 	public function CarrotStage3()
@@ -175,6 +202,15 @@ class Scene2 extends FlxState
 		carrots.add(new Ingredient(750, 750, carrotTopPicture));
 		add(carrots);
 		add(glowcarrots);
+
+		carrots.forEach((carrot:Ingredient) -> carrot.width = 75);
+		carrots.forEach((carrot:Ingredient) -> carrot.height = 75);
+		carrots.forEach((carrot:Ingredient) -> carrot.offset.x = 12);
+		carrots.forEach((carrot:Ingredient) -> carrot.offset.y = 12);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.width = 75);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.height = 75);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.x = 12);
+		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.y = 12);
 	}
 
 	private function backToMap()
