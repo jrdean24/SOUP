@@ -54,7 +54,7 @@ class MapScene extends FlxState
 		walls.add(new Wall(0, 0, 1400, 1)); // top border
 		walls.add(new Wall(0, 0, 1, 1000)); // east border
 		walls.add(new Wall(1400, 0, 1, 1000)); // bottom border
-		walls.add(new Wall(1400, 1000, 1400, 1)); // Bottom Border
+		walls.add(new Wall(0, 1000, 1400, 1)); // Bottom Border
 		add(walls);
 
 		scene1Graphic = new FlxSprite(100, 700);

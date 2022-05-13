@@ -73,6 +73,11 @@ class Scene3 extends FlxState
 		}
 		add(potatoes);
 
+		potatoes.forEach((potato:Ingredient) -> potato.width = 40);
+		potatoes.forEach((potato:Ingredient) -> potato.height = 40);
+		potatoes.forEach((potato:Ingredient) -> potato.offset.x = 5);
+		potatoes.forEach((potato:Ingredient) -> potato.offset.y = 5);
+
 		bushes = new FlxTypedGroup<item.Bush>();
 		bushes.add(new Bush(689, 49, bush4));
 		bushes.add(new Bush(264, 70, bush4));

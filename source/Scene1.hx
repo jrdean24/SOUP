@@ -46,8 +46,8 @@ class Scene1 extends FlxState
 		walls = new FlxTypedGroup<item.Wall>();
 		walls.add(new Wall(0, 0, 1400, 1)); // top border
 		walls.add(new Wall(0, 0, 1, 1000)); // east border
-		walls.add(new Wall(0, 900, 1400, 100)); // bottom border
-		walls.add(new Wall(1300, 0, 100, 1000)); // west Border
+		walls.add(new Wall(0, 1000, 1400, 1)); // bottom border
+		walls.add(new Wall(1400, 0, 1, 1000)); // west Border
 		walls.add(new Wall(0, 20, 70, 150)); // top tree
 		walls.add(new Wall(820, 900, 200, 100)); // Bottom tree
 		walls.add(new Wall(650, 360, 100, 20)); // top log
