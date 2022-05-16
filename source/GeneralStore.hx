@@ -61,7 +61,7 @@ class GeneralStore extends FlxState
 		walls.add(new Wall(1399, 0, 1, 1000)); // west Border
 		add(walls);
 
-		instructionStart = new Wall(50, 50, 100, 100);
+		instructionStart = new Wall(0, 0, 1400, 1000);
 		add(instructionStart);
 
 		add(new FlxSprite(0, 0, "assets/images/Flower_Field.png"));
@@ -99,7 +99,7 @@ class GeneralStore extends FlxState
 		}
 		add(redFlowers);
 
-		hero = new Hero(50, 50);
+		hero = new Hero(50, 250);
 		add(hero);
 
 		textBox = new Ingredient(25, 400, "assets/images/Text_Box.png");

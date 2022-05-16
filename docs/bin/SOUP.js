@@ -912,7 +912,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "33";
+	app.meta.h["build"] = "38";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "SOUP";
 	app.meta.h["name"] = "SOUP";
@@ -3400,7 +3400,7 @@ openfl_display_Sprite.prototype = $extend(openfl_display_DisplayObjectContainer.
 });
 var Main = function() {
 	openfl_display_Sprite.call(this);
-	this.addChild(new flixel_FlxGame(1400,1000,MapScene));
+	this.addChild(new flixel_FlxGame(1400,1000,StartScreen));
 };
 $hxClasses["Main"] = Main;
 Main.__name__ = "Main";
@@ -3418,538 +3418,6 @@ DocumentClass.__name__ = "DocumentClass";
 DocumentClass.__super__ = Main;
 DocumentClass.prototype = $extend(Main.prototype,{
 	__class__: DocumentClass
-});
-var EReg = function(r,opt) {
-	this.r = new RegExp(r,opt.split("u").join(""));
-};
-$hxClasses["EReg"] = EReg;
-EReg.__name__ = "EReg";
-EReg.prototype = {
-	r: null
-	,match: function(s) {
-		if(this.r.global) {
-			this.r.lastIndex = 0;
-		}
-		this.r.m = this.r.exec(s);
-		this.r.s = s;
-		return this.r.m != null;
-	}
-	,matched: function(n) {
-		if(this.r.m != null && n >= 0 && n < this.r.m.length) {
-			return this.r.m[n];
-		} else {
-			throw haxe_Exception.thrown("EReg::matched");
-		}
-	}
-	,matchedRight: function() {
-		if(this.r.m == null) {
-			throw haxe_Exception.thrown("No string matched");
-		}
-		var sz = this.r.m.index + this.r.m[0].length;
-		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
-	}
-	,matchedPos: function() {
-		if(this.r.m == null) {
-			throw haxe_Exception.thrown("No string matched");
-		}
-		return { pos : this.r.m.index, len : this.r.m[0].length};
-	}
-	,matchSub: function(s,pos,len) {
-		if(len == null) {
-			len = -1;
-		}
-		if(this.r.global) {
-			this.r.lastIndex = pos;
-			this.r.m = this.r.exec(len < 0 ? s : HxOverrides.substr(s,0,pos + len));
-			var b = this.r.m != null;
-			if(b) {
-				this.r.s = s;
-			}
-			return b;
-		} else {
-			var b = this.match(len < 0 ? HxOverrides.substr(s,pos,null) : HxOverrides.substr(s,pos,len));
-			if(b) {
-				this.r.s = s;
-				this.r.m.index += pos;
-			}
-			return b;
-		}
-	}
-	,split: function(s) {
-		var d = "#__delim__#";
-		return s.replace(this.r,d).split(d);
-	}
-	,map: function(s,f) {
-		var offset = 0;
-		var buf_b = "";
-		while(true) {
-			if(offset >= s.length) {
-				break;
-			} else if(!this.matchSub(s,offset)) {
-				buf_b += Std.string(HxOverrides.substr(s,offset,null));
-				break;
-			}
-			var p = this.matchedPos();
-			buf_b += Std.string(HxOverrides.substr(s,offset,p.pos - offset));
-			buf_b += Std.string(f(this));
-			if(p.len == 0) {
-				buf_b += Std.string(HxOverrides.substr(s,p.pos,1));
-				offset = p.pos + 1;
-			} else {
-				offset = p.pos + p.len;
-			}
-			if(!this.r.global) {
-				break;
-			}
-		}
-		if(!this.r.global && offset > 0 && offset < s.length) {
-			buf_b += Std.string(HxOverrides.substr(s,offset,null));
-		}
-		return buf_b;
-	}
-	,__class__: EReg
-};
-var HxOverrides = function() { };
-$hxClasses["HxOverrides"] = HxOverrides;
-HxOverrides.__name__ = "HxOverrides";
-HxOverrides.strDate = function(s) {
-	switch(s.length) {
-	case 8:
-		var k = s.split(":");
-		var d = new Date();
-		d["setTime"](0);
-		d["setUTCHours"](k[0]);
-		d["setUTCMinutes"](k[1]);
-		d["setUTCSeconds"](k[2]);
-		return d;
-	case 10:
-		var k = s.split("-");
-		return new Date(k[0],k[1] - 1,k[2],0,0,0);
-	case 19:
-		var k = s.split(" ");
-		var y = k[0].split("-");
-		var t = k[1].split(":");
-		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
-	default:
-		throw haxe_Exception.thrown("Invalid date format : " + s);
-	}
-};
-HxOverrides.cca = function(s,index) {
-	var x = s.charCodeAt(index);
-	if(x != x) {
-		return undefined;
-	}
-	return x;
-};
-HxOverrides.substr = function(s,pos,len) {
-	if(len == null) {
-		len = s.length;
-	} else if(len < 0) {
-		if(pos == 0) {
-			len = s.length + len;
-		} else {
-			return "";
-		}
-	}
-	return s.substr(pos,len);
-};
-HxOverrides.remove = function(a,obj) {
-	var i = a.indexOf(obj);
-	if(i == -1) {
-		return false;
-	}
-	a.splice(i,1);
-	return true;
-};
-HxOverrides.now = function() {
-	return Date.now();
-};
-var IntIterator = function(min,max) {
-	this.min = min;
-	this.max = max;
-};
-$hxClasses["IntIterator"] = IntIterator;
-IntIterator.__name__ = "IntIterator";
-IntIterator.prototype = {
-	min: null
-	,max: null
-	,hasNext: function() {
-		return this.min < this.max;
-	}
-	,next: function() {
-		return this.min++;
-	}
-	,__class__: IntIterator
-};
-var Lambda = function() { };
-$hxClasses["Lambda"] = Lambda;
-Lambda.__name__ = "Lambda";
-Lambda.array = function(it) {
-	var a = [];
-	var i = $getIterator(it);
-	while(i.hasNext()) {
-		var i1 = i.next();
-		a.push(i1);
-	}
-	return a;
-};
-var ManifestResources = function() { };
-$hxClasses["ManifestResources"] = ManifestResources;
-ManifestResources.__name__ = "ManifestResources";
-ManifestResources.preloadLibraries = null;
-ManifestResources.preloadLibraryNames = null;
-ManifestResources.rootPath = null;
-ManifestResources.init = function(config) {
-	ManifestResources.preloadLibraries = [];
-	ManifestResources.preloadLibraryNames = [];
-	ManifestResources.rootPath = null;
-	if(config != null && Object.prototype.hasOwnProperty.call(config,"rootPath")) {
-		ManifestResources.rootPath = Reflect.field(config,"rootPath");
-	}
-	if(ManifestResources.rootPath == null) {
-		ManifestResources.rootPath = "./";
-	}
-	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf);
-	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf);
-	var bundle;
-	var data = "{\"name\":null,\"assets\":\"aoy4:pathy34:assets%2Fdata%2Fdata-goes-here.txty4:sizezy4:typey4:TEXTy2:idR1y7:preloadtgoR0y28:assets%2Fimages%2FCarrot.pngR2i3852R3y5:IMAGER5R7R6tgoR0y32:assets%2Fimages%2FcarrotFarm.pngR2i2295106R3R8R5R9R6tgoR0y31:assets%2Fimages%2FcarrotTop.pngR2i5341R3R8R5R10R6tgoR0y26:assets%2Fimages%2FCows.pngR2i1884252R3R8R5R11R6tgoR0y34:assets%2Fimages%2FfullMilkPail.pngR2i9791R3R8R5R12R6tgoR0y26:assets%2Fimages%2Fgirl.pngR2i55847R3R8R5R13R6tgoR0y31:assets%2Fimages%2FgirlSmall.pngR2i7983R3R8R5R14R6tgoR0y38:assets%2Fimages%2FglowingCarrotTop.pngR2i17553R3R8R5R15R6tgoR0y30:assets%2Fimages%2FheroEast.pngR2i5411R3R8R5R16R6tgoR0y31:assets%2Fimages%2FheroLarge.pngR2i48690R3R8R5R17R6tgoR0y31:assets%2Fimages%2FheroNorth.pngR2i5270R3R8R5R18R6tgoR0y31:assets%2Fimages%2FheroSouth.pngR2i5519R3R8R5R19R6tgoR0y30:assets%2Fimages%2FheroWest.pngR2i5974R3R8R5R20R6tgoR0y26:assets%2Fimages%2Fmilk.pngR2i2925R3R8R5R21R6tgoR0y30:assets%2Fimages%2FmilkPail.pngR2i9800R3R8R5R22R6tgoR0y27:assets%2Fimages%2Fonion.pngR2i4256R3R8R5R23R6tgoR0y31:assets%2Fimages%2FOnionGirl.pngR2i7446R3R8R5R24R6tgoR0y36:assets%2Fimages%2FOnionGirlLarge.pngR2i102925R3R8R5R25R6tgoR0y25:assets%2Fimages%2FPot.pngR2i10537R3R8R5R26R6tgoR0y28:assets%2Fimages%2FPotato.pngR2i4118R3R8R5R27R6tgoR0y32:assets%2Fimages%2FpotatoEast.pngR2i5074R3R8R5R28R6tgoR0y33:assets%2Fimages%2FpotatoNorth.pngR2i3648R3R8R5R29R6tgoR0y33:assets%2Fimages%2FPotatoSouth.pngR2i5250R3R8R5R30R6tgoR0y32:assets%2Fimages%2FpotatoWest.pngR2i4948R3R8R5R31R6tgoR0y34:assets%2Fimages%2FPotato_Bush1.pngR2i11727R3R8R5R32R6tgoR0y34:assets%2Fimages%2FPotato_Bush2.pngR2i11901R3R8R5R33R6tgoR0y34:assets%2Fimages%2FPotato_Bush3.pngR2i9346R3R8R5R34R6tgoR0y34:assets%2Fimages%2FPotato_Bush4.pngR2i48319R3R8R5R35R6tgoR0y34:assets%2Fimages%2FPotato_Field.pngR2i1427120R3R8R5R36R6tgoR0y41:assets%2Fimages%2FPotato_Fieldman%201.pngR2i1018213R3R8R5R37R6tgoR0y37:assets%2Fimages%2FPotato_Fieldman.pngR2i1017654R3R8R5R38R6tgoR0y36:assets%2Fimages%2FSouper%20Spice.pngR2i3213R3R8R5R39R6tgoR0y34:assets%2Fimages%2FSoupLocation.pngR2i2032991R3R8R5R40R6tgoR0y30:assets%2Fimages%2FText_Box.pngR2i7974R3R8R5R41R6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R42R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R43R6tgoR2i2114R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3y9:pathGroupaR45y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R44R5y28:flixel%2Fsounds%2Fflixel.mp3R46aR48y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i5794R3y5:SOUNDR5R47R46aR45R47hgoR2i33629R3R50R5R49R46aR48R49hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R51R52y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i519R3R8R5R57R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i3280R3R8R5R58R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
-	var manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
-	var library = lime_utils_AssetLibrary.fromManifest(manifest);
-	lime_utils_Assets.registerLibrary("default",library);
-	library = lime_utils_Assets.getLibrary("default");
-	if(library != null) {
-		ManifestResources.preloadLibraries.push(library);
-	} else {
-		ManifestResources.preloadLibraryNames.push("default");
-	}
-};
-var lime_text_Font = function(name) {
-	if(name != null) {
-		this.name = name;
-	}
-	if(!this.__init) {
-		if(this.ascender == undefined) {
-			this.ascender = 0;
-		}
-		if(this.descender == undefined) {
-			this.descender = 0;
-		}
-		if(this.height == undefined) {
-			this.height = 0;
-		}
-		if(this.numGlyphs == undefined) {
-			this.numGlyphs = 0;
-		}
-		if(this.underlinePosition == undefined) {
-			this.underlinePosition = 0;
-		}
-		if(this.underlineThickness == undefined) {
-			this.underlineThickness = 0;
-		}
-		if(this.unitsPerEM == undefined) {
-			this.unitsPerEM = 0;
-		}
-		if(this.__fontID != null) {
-			if(lime_utils_Assets.isLocal(this.__fontID)) {
-				this.__fromBytes(lime_utils_Assets.getBytes(this.__fontID));
-			}
-		} else if(this.__fontPath != null) {
-			this.__fromFile(this.__fontPath);
-		}
-	}
-};
-$hxClasses["lime.text.Font"] = lime_text_Font;
-lime_text_Font.__name__ = "lime.text.Font";
-lime_text_Font.fromBytes = function(bytes) {
-	if(bytes == null) {
-		return null;
-	}
-	var font = new lime_text_Font();
-	font.__fromBytes(bytes);
-	return font;
-};
-lime_text_Font.fromFile = function(path) {
-	if(path == null) {
-		return null;
-	}
-	var font = new lime_text_Font();
-	font.__fromFile(path);
-	return font;
-};
-lime_text_Font.loadFromBytes = function(bytes) {
-	return lime_app_Future.withValue(lime_text_Font.fromBytes(bytes));
-};
-lime_text_Font.loadFromFile = function(path) {
-	var request = new lime_net__$HTTPRequest_$lime_$text_$Font();
-	return request.load(path).then(function(font) {
-		if(font != null) {
-			return lime_app_Future.withValue(font);
-		} else {
-			return lime_app_Future.withError("");
-		}
-	});
-};
-lime_text_Font.loadFromName = function(path) {
-	var font = new lime_text_Font();
-	return font.__loadFromName(path);
-};
-lime_text_Font.__measureFontNode = function(fontFamily) {
-	var node = window.document.createElement("span");
-	node.setAttribute("aria-hidden","true");
-	var text = window.document.createTextNode("BESbswy");
-	node.appendChild(text);
-	var style = node.style;
-	style.display = "block";
-	style.position = "absolute";
-	style.top = "-9999px";
-	style.left = "-9999px";
-	style.fontSize = "300px";
-	style.width = "auto";
-	style.height = "auto";
-	style.lineHeight = "normal";
-	style.margin = "0";
-	style.padding = "0";
-	style.fontVariant = "normal";
-	style.whiteSpace = "nowrap";
-	style.fontFamily = fontFamily;
-	window.document.body.appendChild(node);
-	return node;
-};
-lime_text_Font.prototype = {
-	ascender: null
-	,descender: null
-	,height: null
-	,name: null
-	,numGlyphs: null
-	,src: null
-	,underlinePosition: null
-	,underlineThickness: null
-	,unitsPerEM: null
-	,__fontID: null
-	,__fontPath: null
-	,__init: null
-	,decompose: function() {
-		return null;
-	}
-	,getGlyph: function(character) {
-		return -1;
-	}
-	,getGlyphs: function(characters) {
-		if(characters == null) {
-			characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^`'\"/\\&*()[]{}<>|:;_-+=?,. ";
-		}
-		return null;
-	}
-	,getGlyphMetrics: function(glyph) {
-		return null;
-	}
-	,renderGlyph: function(glyph,fontSize) {
-		return null;
-	}
-	,renderGlyphs: function(glyphs,fontSize) {
-		return null;
-	}
-	,__copyFrom: function(other) {
-		if(other != null) {
-			this.ascender = other.ascender;
-			this.descender = other.descender;
-			this.height = other.height;
-			this.name = other.name;
-			this.numGlyphs = other.numGlyphs;
-			this.src = other.src;
-			this.underlinePosition = other.underlinePosition;
-			this.underlineThickness = other.underlineThickness;
-			this.unitsPerEM = other.unitsPerEM;
-			this.__fontID = other.__fontID;
-			this.__fontPath = other.__fontPath;
-			this.__init = true;
-		}
-	}
-	,__fromBytes: function(bytes) {
-		this.__fontPath = null;
-	}
-	,__fromFile: function(path) {
-		this.__fontPath = path;
-	}
-	,__initializeSource: function() {
-		this.__init = true;
-	}
-	,__loadFromName: function(name) {
-		var _gthis = this;
-		var promise = new lime_app_Promise();
-		this.name = name;
-		var userAgent = $global.navigator.userAgent.toLowerCase();
-		var isSafari = userAgent.indexOf(" safari/") >= 0 && userAgent.indexOf(" chrome/") < 0;
-		var isUIWebView = new EReg("(iPhone|iPod|iPad).*AppleWebKit(?!.*Version)","i").match(userAgent);
-		if(!isSafari && !isUIWebView && (window.document.fonts && ($_=window.document.fonts,$bind($_,$_.load)))) {
-			window.document.fonts.load("1em '" + name + "'").then(function(_) {
-				promise.complete(_gthis);
-			},function(_) {
-				lime_utils_Log.warn("Could not load web font \"" + name + "\"",{ fileName : "lime/text/Font.hx", lineNumber : 513, className : "lime.text.Font", methodName : "__loadFromName"});
-				promise.complete(_gthis);
-			});
-		} else {
-			var node1 = lime_text_Font.__measureFontNode("'" + name + "', sans-serif");
-			var node2 = lime_text_Font.__measureFontNode("'" + name + "', serif");
-			var width1 = node1.offsetWidth;
-			var width2 = node2.offsetWidth;
-			var interval = -1;
-			var timeout = 3000;
-			var intervalLength = 50;
-			var intervalCount = 0;
-			var loaded;
-			var timeExpired;
-			var checkFont = function() {
-				intervalCount += 1;
-				loaded = node1.offsetWidth != width1 || node2.offsetWidth != width2;
-				timeExpired = intervalCount * intervalLength >= timeout;
-				if(loaded || timeExpired) {
-					window.clearInterval(interval);
-					node1.parentNode.removeChild(node1);
-					node2.parentNode.removeChild(node2);
-					node1 = null;
-					node2 = null;
-					if(timeExpired) {
-						lime_utils_Log.warn("Could not load web font \"" + name + "\"",{ fileName : "lime/text/Font.hx", lineNumber : 548, className : "lime.text.Font", methodName : "__loadFromName"});
-					}
-					promise.complete(_gthis);
-				}
-			};
-			interval = window.setInterval(checkFont,intervalLength);
-		}
-		return promise.future;
-	}
-	,__setSize: function(size) {
-	}
-	,__class__: lime_text_Font
-};
-var _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf = $hx_exports["__ASSET__flixel_fonts_nokiafc22_ttf"] = function() {
-	this.ascender = 2048;
-	this.descender = -512;
-	this.height = 2816;
-	this.numGlyphs = 172;
-	this.underlinePosition = -640;
-	this.underlineThickness = 256;
-	this.unitsPerEM = 2048;
-	this.name = "Nokia Cellphone FC Small";
-	lime_text_Font.call(this);
-};
-$hxClasses["__ASSET__flixel_fonts_nokiafc22_ttf"] = _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf;
-_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.__name__ = "__ASSET__flixel_fonts_nokiafc22_ttf";
-_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.__super__ = lime_text_Font;
-_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.prototype = $extend(lime_text_Font.prototype,{
-	__class__: _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf
-});
-var _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf = $hx_exports["__ASSET__flixel_fonts_monsterrat_ttf"] = function() {
-	this.ascender = 968;
-	this.descender = -251;
-	this.height = 1219;
-	this.numGlyphs = 263;
-	this.underlinePosition = -150;
-	this.underlineThickness = 50;
-	this.unitsPerEM = 1000;
-	this.name = "Monsterrat";
-	lime_text_Font.call(this);
-};
-$hxClasses["__ASSET__flixel_fonts_monsterrat_ttf"] = _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf;
-_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.__name__ = "__ASSET__flixel_fonts_monsterrat_ttf";
-_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.__super__ = lime_text_Font;
-_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.prototype = $extend(lime_text_Font.prototype,{
-	__class__: _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf
-});
-var openfl_text_Font = function(name) {
-	lime_text_Font.call(this,name);
-};
-$hxClasses["openfl.text.Font"] = openfl_text_Font;
-openfl_text_Font.__name__ = "openfl.text.Font";
-openfl_text_Font.enumerateFonts = function(enumerateDeviceFonts) {
-	if(enumerateDeviceFonts == null) {
-		enumerateDeviceFonts = false;
-	}
-	return openfl_text_Font.__registeredFonts;
-};
-openfl_text_Font.fromBytes = function(bytes) {
-	var font = new openfl_text_Font();
-	font.__fromBytes(openfl_utils_ByteArray.toBytes(bytes));
-	return font;
-};
-openfl_text_Font.fromFile = function(path) {
-	var font = new openfl_text_Font();
-	font.__fromFile(path);
-	return font;
-};
-openfl_text_Font.loadFromBytes = function(bytes) {
-	return lime_text_Font.loadFromBytes(openfl_utils_ByteArray.toBytes(bytes)).then(function(limeFont) {
-		var font = new openfl_text_Font();
-		font.__fromLimeFont(limeFont);
-		return lime_app_Future.withValue(font);
-	});
-};
-openfl_text_Font.loadFromFile = function(path) {
-	return lime_text_Font.loadFromFile(path).then(function(limeFont) {
-		var font = new openfl_text_Font();
-		font.__fromLimeFont(limeFont);
-		return lime_app_Future.withValue(font);
-	});
-};
-openfl_text_Font.loadFromName = function(path) {
-	return lime_text_Font.loadFromName(path).then(function(limeFont) {
-		var font = new openfl_text_Font();
-		font.__fromLimeFont(limeFont);
-		return lime_app_Future.withValue(font);
-	});
-};
-openfl_text_Font.registerFont = function(font) {
-	var instance = null;
-	if(js_Boot.getClass(font) == null) {
-		instance = js_Boot.__cast(Type.createInstance(font,[]) , openfl_text_Font);
-	} else {
-		instance = js_Boot.__cast(font , openfl_text_Font);
-	}
-	if(instance != null) {
-		openfl_text_Font.__registeredFonts.push(instance);
-		openfl_text_Font.__fontByName.h[instance.name] = instance;
-	}
-};
-openfl_text_Font.__super__ = lime_text_Font;
-openfl_text_Font.prototype = $extend(lime_text_Font.prototype,{
-	fontStyle: null
-	,fontType: null
-	,__initialized: null
-	,__fromLimeFont: function(font) {
-		this.__copyFrom(font);
-	}
-	,__initialize: function() {
-		return this.__initialized;
-	}
-	,get_fontName: function() {
-		return this.name;
-	}
-	,set_fontName: function(value) {
-		return this.name = value;
-	}
-	,__class__: openfl_text_Font
-	,__properties__: {set_fontName:"set_fontName",get_fontName:"get_fontName"}
-});
-var _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf = $hx_exports["__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf"] = function() {
-	this.__fromLimeFont(new _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf());
-	openfl_text_Font.call(this);
-};
-$hxClasses["__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf"] = _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf;
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.__name__ = "__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf";
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.__super__ = openfl_text_Font;
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.prototype = $extend(openfl_text_Font.prototype,{
-	__class__: _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf
-});
-var _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf = $hx_exports["__ASSET__OPENFL__flixel_fonts_monsterrat_ttf"] = function() {
-	this.__fromLimeFont(new _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf());
-	openfl_text_Font.call(this);
-};
-$hxClasses["__ASSET__OPENFL__flixel_fonts_monsterrat_ttf"] = _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf;
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.__name__ = "__ASSET__OPENFL__flixel_fonts_monsterrat_ttf";
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.__super__ = openfl_text_Font;
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.prototype = $extend(openfl_text_Font.prototype,{
-	__class__: _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf
 });
 var flixel_util_IFlxDestroyable = function() { };
 $hxClasses["flixel.util.IFlxDestroyable"] = flixel_util_IFlxDestroyable;
@@ -4711,6 +4179,1179 @@ flixel_FlxState.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
 	,__class__: flixel_FlxState
 	,__properties__: $extend(flixel_group_FlxTypedGroup.prototype.__properties__,{get_subStateClosed:"get_subStateClosed",get_subStateOpened:"get_subStateOpened",set_bgColor:"set_bgColor",get_bgColor:"get_bgColor"})
 });
+var CarrotField = function(incomingInventory) {
+	this.carrotTopPicture = "assets/images/carrotTop.png";
+	this.glowingCarrotTopPicture = "assets/images/glowingCarrotTop.png";
+	this.carrotPicture = "assets/images/Carrot.png";
+	this.stageNum = 1;
+	this.carrotCount = 0;
+	flixel_FlxState.call(this);
+	this.inventory = incomingInventory;
+};
+$hxClasses["CarrotField"] = CarrotField;
+CarrotField.__name__ = "CarrotField";
+CarrotField.__super__ = flixel_FlxState;
+CarrotField.prototype = $extend(flixel_FlxState.prototype,{
+	inventory: null
+	,carrotNum: null
+	,potatoNum: null
+	,milkNum: null
+	,onionNum: null
+	,souperSpiceNum: null
+	,redFlowerNum: null
+	,yellowFlowerNum: null
+	,blueFlowerNum: null
+	,inventoryDisplayBox: null
+	,returnDisplayBox: null
+	,hero: null
+	,carrots: null
+	,glowcarrots: null
+	,carrotCount: null
+	,instructionStart: null
+	,textBox: null
+	,instructions: null
+	,carrotGal: null
+	,walls: null
+	,stageNum: null
+	,carrotPicture: null
+	,glowingCarrotTopPicture: null
+	,carrotTopPicture: null
+	,create: function() {
+		flixel_FlxState.prototype.create.call(this);
+		this.walls = new flixel_group_FlxTypedGroup();
+		this.walls.add(new item_Wall(120,140,600,80));
+		this.walls.add(new item_Wall(0,0,130,200));
+		this.walls.add(new item_Wall(710,0,flixel_FlxG.width - 710,225));
+		this.walls.add(new item_Wall(800,225,600,25));
+		this.walls.add(new item_Wall(970,250,500,200));
+		this.walls.add(new item_Wall(1350,750,50,150));
+		this.walls.add(new item_Wall(130,360,30,600));
+		this.walls.add(new item_Wall(120,flixel_FlxG.height - 100,200,60));
+		this.walls.add(new item_Wall(400,flixel_FlxG.height - 100,600,60));
+		this.walls.add(new item_Wall(960,flixel_FlxG.height - 150,30,110));
+		this.walls.add(new item_Wall(flixel_FlxG.width - 100,500,100,100));
+		this.walls.add(new item_Wall(0,flixel_FlxG.height - 450,100,350));
+		this.walls.add(new item_Wall(0,flixel_FlxG.height - 550,30,100));
+		this.walls.add(new item_Wall(0,0,1400,70));
+		this.walls.add(new item_Wall(0,0,1,1000));
+		this.walls.add(new item_Wall(0,1000,1400,1));
+		this.walls.add(new item_Wall(1400,0,1,1000));
+		this.add(this.walls);
+		this.instructionStart = new item_Wall(0,0,1400,1000);
+		this.add(this.instructionStart);
+		this.add(new flixel_FlxSprite(0,0,"assets/images/carrotFarm.png"));
+		this.carrots = new flixel_group_FlxTypedGroup();
+		this.glowcarrots = new flixel_group_FlxTypedGroup();
+		this.carrots.add(new item_Ingredient(350,450,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,450,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(550,450,this.glowingCarrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(650,450,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(750,450,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(350,600,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,600,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(550,600,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(650,600,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(750,600,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(350,750,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,750,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(550,750,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(650,750,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(750,750,this.glowingCarrotTopPicture));
+		this.add(this.carrots);
+		this.add(this.glowcarrots);
+		this.carrots.forEach(function(carrot) {
+			carrot.set_width(50);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.set_height(50);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.offset.set_x(25);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.offset.set_y(25);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.set_width(50);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.set_height(50);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.offset.set_x(25);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.offset.set_y(25);
+		});
+		this.carrotGal = new character_NPC(1000,300,"assets/images/carrotGirl.png");
+		this.add(this.carrotGal);
+		this.hero = new character_Hero(50,260);
+		this.add(this.hero);
+		this.textBox = new item_Ingredient(25,400,"assets/images/Text_Box.png");
+		this.instructions = new flixel_text_FlxText(50,425,1300," ",24);
+		this.returnDisplayBox = new item_Wall(0,0,1400,70);
+		this.returnDisplayBox.set_color(-8355712);
+		this.add(this.returnDisplayBox);
+		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
+		this.add(new flixel_FlxSprite(425,10,"assets/images/Carrot.png"));
+		this.add(new flixel_FlxSprite(540,10,"assets/images/Potato.png"));
+		this.add(new flixel_FlxSprite(655,10,"assets/images/milk.png"));
+		this.add(new flixel_FlxSprite(770,10,"assets/images/onion.png"));
+		this.add(new flixel_FlxSprite(885,10,"assets/images/souperSpice.png"));
+		this.add(new flixel_FlxSprite(1000,10,"assets/images/redFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1115,10,"assets/images/yellowFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1230,10,"assets/images/blueFlowerIcon.png"));
+		this.carrotNum = new flixel_text_FlxText(475,20,0," " + this.inventory.carrots,24,true);
+		this.potatoNum = new flixel_text_FlxText(590,20,0," " + this.inventory.potatoes,24,true);
+		this.milkNum = new flixel_text_FlxText(705,20,0," " + this.inventory.milk,24,true);
+		this.onionNum = new flixel_text_FlxText(820,20,0," " + this.inventory.onions,24,true);
+		this.souperSpiceNum = new flixel_text_FlxText(935,20,0," " + this.inventory.souperSpice,24,true);
+		this.redFlowerNum = new flixel_text_FlxText(1050,20,0," " + this.inventory.redFlower,24,true);
+		this.yellowFlowerNum = new flixel_text_FlxText(1165,20,0," " + this.inventory.yellowFlower,24,true);
+		this.blueFlowerNum = new flixel_text_FlxText(1280,20,0," " + this.inventory.blueFlower,24,true);
+		this.add(this.inventoryDisplayBox);
+		this.add(this.carrotNum);
+		this.add(this.potatoNum);
+		this.add(this.milkNum);
+		this.add(this.onionNum);
+		this.add(this.souperSpiceNum);
+		this.add(this.redFlowerNum);
+		this.add(this.yellowFlowerNum);
+		this.add(this.blueFlowerNum);
+	}
+	,CarrotStage1: function() {
+		this.carrots.add(new item_Ingredient(350,450,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,450,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(550,450,this.glowingCarrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(650,450,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(750,450,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(350,600,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,600,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(550,600,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(650,600,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(750,600,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(350,750,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,750,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(550,750,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(650,750,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(750,750,this.glowingCarrotTopPicture));
+		this.add(this.carrots);
+		this.add(this.glowcarrots);
+		this.carrots.forEach(function(carrot) {
+			carrot.set_width(50);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.set_height(50);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.offset.set_x(25);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.offset.set_y(25);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.set_width(50);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.set_height(50);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.offset.set_x(25);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.offset.set_y(25);
+		});
+	}
+	,CarrotStage2: function() {
+		this.glowcarrots.add(new item_Ingredient(350,450,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,450,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(550,450,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(650,450,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(750,450,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(350,600,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,600,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(550,600,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(650,600,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(750,600,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(350,750,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(450,750,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(550,750,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(650,750,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(750,750,this.carrotTopPicture));
+		this.add(this.carrots);
+		this.add(this.glowcarrots);
+		this.carrots.forEach(function(carrot) {
+			carrot.set_width(50);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.set_height(50);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.offset.set_x(25);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.offset.set_y(25);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.set_width(50);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.set_height(50);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.offset.set_x(25);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.offset.set_y(25);
+		});
+	}
+	,CarrotStage3: function() {
+		this.carrots.add(new item_Ingredient(350,450,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(450,450,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(550,450,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(650,450,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(750,450,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(350,600,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(450,600,this.glowingCarrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(550,600,this.glowingCarrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(650,600,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(750,600,this.carrotTopPicture));
+		this.glowcarrots.add(new item_Ingredient(350,750,this.glowingCarrotTopPicture));
+		this.carrots.add(new item_Ingredient(450,750,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(550,750,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(650,750,this.carrotTopPicture));
+		this.carrots.add(new item_Ingredient(750,750,this.carrotTopPicture));
+		this.add(this.carrots);
+		this.add(this.glowcarrots);
+		this.carrots.forEach(function(carrot) {
+			carrot.set_width(50);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.set_height(50);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.offset.set_x(25);
+		});
+		this.carrots.forEach(function(carrot) {
+			carrot.offset.set_y(25);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.set_width(50);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.set_height(50);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.offset.set_x(25);
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.offset.set_y(25);
+		});
+	}
+	,backToMap: function() {
+		var nextState = new MapScene(this.inventory);
+		if(flixel_FlxG.game._state.switchTo(nextState)) {
+			flixel_FlxG.game._requestedState = nextState;
+		}
+	}
+	,ResetStage: function() {
+		this.carrots.forEach(function(carrot) {
+			carrot.kill();
+		});
+		this.glowcarrots.forEach(function(carrot) {
+			carrot.kill();
+		});
+	}
+	,AddCarrot: function(obj1,obj2) {
+		obj1.kill();
+		this.carrotCount++;
+		this.inventory.addCarrots(1);
+		this.carrotNum.set_text(" " + this.inventory.carrots);
+	}
+	,DisplayInstructions: function(obj1,obj2) {
+		this.add(this.textBox);
+		this.add(this.instructions);
+		this.instructions.set_text("Hello, welcome to the Carrot Farm. Feel free to pick some carrots from the field for your soup! Enter to exit");
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(13,_this.status)) {
+			this.textBox.kill();
+			this.instructions.kill();
+		}
+	}
+	,update: function(elapsed) {
+		flixel_FlxG.overlap(this.glowcarrots,this.hero,$bind(this,this.AddCarrot));
+		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.instructionStart,this.hero,$bind(this,this.DisplayInstructions));
+		if(this.carrotCount == 0 && this.stageNum == 1) {
+			this.ResetStage();
+			this.CarrotStage1();
+			this.stageNum = 2;
+		} else if(this.carrotCount == 6 && this.stageNum == 2) {
+			this.ResetStage();
+			this.CarrotStage2();
+			this.stageNum = 3;
+		} else if(this.carrotCount == 12 && this.stageNum == 3) {
+			this.ResetStage();
+			this.CarrotStage3();
+		} else if(this.carrotCount == 18) {
+			this.ResetStage();
+		}
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
+			var nextState = new MapScene(this.inventory);
+			if(flixel_FlxG.game._state.switchTo(nextState)) {
+				flixel_FlxG.game._requestedState = nextState;
+			}
+		}
+		flixel_FlxState.prototype.update.call(this,elapsed);
+	}
+	,__class__: CarrotField
+});
+var EReg = function(r,opt) {
+	this.r = new RegExp(r,opt.split("u").join(""));
+};
+$hxClasses["EReg"] = EReg;
+EReg.__name__ = "EReg";
+EReg.prototype = {
+	r: null
+	,match: function(s) {
+		if(this.r.global) {
+			this.r.lastIndex = 0;
+		}
+		this.r.m = this.r.exec(s);
+		this.r.s = s;
+		return this.r.m != null;
+	}
+	,matched: function(n) {
+		if(this.r.m != null && n >= 0 && n < this.r.m.length) {
+			return this.r.m[n];
+		} else {
+			throw haxe_Exception.thrown("EReg::matched");
+		}
+	}
+	,matchedRight: function() {
+		if(this.r.m == null) {
+			throw haxe_Exception.thrown("No string matched");
+		}
+		var sz = this.r.m.index + this.r.m[0].length;
+		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
+	}
+	,matchedPos: function() {
+		if(this.r.m == null) {
+			throw haxe_Exception.thrown("No string matched");
+		}
+		return { pos : this.r.m.index, len : this.r.m[0].length};
+	}
+	,matchSub: function(s,pos,len) {
+		if(len == null) {
+			len = -1;
+		}
+		if(this.r.global) {
+			this.r.lastIndex = pos;
+			this.r.m = this.r.exec(len < 0 ? s : HxOverrides.substr(s,0,pos + len));
+			var b = this.r.m != null;
+			if(b) {
+				this.r.s = s;
+			}
+			return b;
+		} else {
+			var b = this.match(len < 0 ? HxOverrides.substr(s,pos,null) : HxOverrides.substr(s,pos,len));
+			if(b) {
+				this.r.s = s;
+				this.r.m.index += pos;
+			}
+			return b;
+		}
+	}
+	,split: function(s) {
+		var d = "#__delim__#";
+		return s.replace(this.r,d).split(d);
+	}
+	,map: function(s,f) {
+		var offset = 0;
+		var buf_b = "";
+		while(true) {
+			if(offset >= s.length) {
+				break;
+			} else if(!this.matchSub(s,offset)) {
+				buf_b += Std.string(HxOverrides.substr(s,offset,null));
+				break;
+			}
+			var p = this.matchedPos();
+			buf_b += Std.string(HxOverrides.substr(s,offset,p.pos - offset));
+			buf_b += Std.string(f(this));
+			if(p.len == 0) {
+				buf_b += Std.string(HxOverrides.substr(s,p.pos,1));
+				offset = p.pos + 1;
+			} else {
+				offset = p.pos + p.len;
+			}
+			if(!this.r.global) {
+				break;
+			}
+		}
+		if(!this.r.global && offset > 0 && offset < s.length) {
+			buf_b += Std.string(HxOverrides.substr(s,offset,null));
+		}
+		return buf_b;
+	}
+	,__class__: EReg
+};
+var FlowerInstructionField = function(incomingInventory) {
+	this.randomYLocation = 0;
+	this.randomXLocation = 0;
+	flixel_FlxState.call(this);
+	this.inventory = incomingInventory;
+};
+$hxClasses["FlowerInstructionField"] = FlowerInstructionField;
+FlowerInstructionField.__name__ = "FlowerInstructionField";
+FlowerInstructionField.__super__ = flixel_FlxState;
+FlowerInstructionField.prototype = $extend(flixel_FlxState.prototype,{
+	inventory: null
+	,carrotNum: null
+	,potatoNum: null
+	,milkNum: null
+	,onionNum: null
+	,souperSpiceNum: null
+	,redFlowerNum: null
+	,yellowFlowerNum: null
+	,blueFlowerNum: null
+	,inventoryDisplayBox: null
+	,returnDisplayBox: null
+	,walls: null
+	,hero: null
+	,redFlowers: null
+	,yellowFlowers: null
+	,randomXLocation: null
+	,randomYLocation: null
+	,recipeeIcon: null
+	,recipeeText: null
+	,recipeeTextBox: null
+	,create: function() {
+		flixel_FlxState.prototype.create.call(this);
+		this.walls = new flixel_group_FlxTypedGroup();
+		this.walls.add(new item_Wall(0,0,1400,100));
+		this.walls.add(new item_Wall(0,0,100,1000));
+		this.walls.add(new item_Wall(0,900,1400,100));
+		this.walls.add(new item_Wall(1300,0,100,1000));
+		this.walls.add(new item_Wall(850,900,600,100));
+		this.walls.add(new item_Wall(0,999,1400,1));
+		this.add(this.walls);
+		this.add(new flixel_FlxSprite(0,0,"assets/images/Potato_Field.png"));
+		var _g = 0;
+		while(_g < 50) {
+			var i = _g++;
+			this.randomizeLocation();
+			this.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,"assets/images/Red_Flower.png"));
+		}
+		var _g = 0;
+		while(_g < 50) {
+			var i = _g++;
+			this.randomizeLocation();
+			this.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,"assets/images/Yellow_Flower.png"));
+		}
+		var _g = 0;
+		while(_g < 50) {
+			var i = _g++;
+			this.randomizeLocation();
+			this.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,"assets/images/Blue_Flower.png"));
+		}
+		this.recipeeIcon = new item_Wall(675,475,50,50);
+		this.add(this.recipeeIcon);
+		this.recipeeTextBox = new item_Wall(300,300,700,600);
+		this.recipeeTextBox.set_color(-8355712);
+		this.recipeeText = new flixel_text_FlxText(325,325,650," ",24);
+		this.hero = new character_Hero(650,850);
+		this.add(this.hero);
+		this.returnDisplayBox = new item_Wall(0,0,1400,70);
+		this.returnDisplayBox.set_color(-8355712);
+		this.add(this.returnDisplayBox);
+		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
+		this.add(new flixel_FlxSprite(425,10,"assets/images/Carrot.png"));
+		this.add(new flixel_FlxSprite(540,10,"assets/images/Potato.png"));
+		this.add(new flixel_FlxSprite(655,10,"assets/images/milk.png"));
+		this.add(new flixel_FlxSprite(770,10,"assets/images/onion.png"));
+		this.add(new flixel_FlxSprite(885,10,"assets/images/souperSpice.png"));
+		this.add(new flixel_FlxSprite(1000,10,"assets/images/redFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1115,10,"assets/images/yellowFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1230,10,"assets/images/blueFlowerIcon.png"));
+		this.carrotNum = new flixel_text_FlxText(475,20,0," " + this.inventory.carrots,24,true);
+		this.potatoNum = new flixel_text_FlxText(590,20,0," " + this.inventory.potatoes,24,true);
+		this.milkNum = new flixel_text_FlxText(705,20,0," " + this.inventory.milk,24,true);
+		this.onionNum = new flixel_text_FlxText(820,20,0," " + this.inventory.onions,24,true);
+		this.souperSpiceNum = new flixel_text_FlxText(935,20,0," " + this.inventory.souperSpice,24,true);
+		this.redFlowerNum = new flixel_text_FlxText(1050,20,0," " + this.inventory.redFlower,24,true);
+		this.yellowFlowerNum = new flixel_text_FlxText(1165,20,0," " + this.inventory.yellowFlower,24,true);
+		this.blueFlowerNum = new flixel_text_FlxText(1280,20,0," " + this.inventory.blueFlower,24,true);
+		this.add(this.inventoryDisplayBox);
+		this.add(this.carrotNum);
+		this.add(this.potatoNum);
+		this.add(this.milkNum);
+		this.add(this.onionNum);
+		this.add(this.souperSpiceNum);
+		this.add(this.redFlowerNum);
+		this.add(this.yellowFlowerNum);
+		this.add(this.blueFlowerNum);
+	}
+	,backToMap: function() {
+		var nextState = new MapScene(this.inventory);
+		if(flixel_FlxG.game._state.switchTo(nextState)) {
+			flixel_FlxG.game._requestedState = nextState;
+		}
+	}
+	,randomizeLocation: function() {
+		this.randomXLocation = flixel_FlxG.random.float(100,1200);
+		this.randomYLocation = flixel_FlxG.random.float(100,800);
+	}
+	,DisplayRecipee: function(obj1,obj2) {
+		this.add(this.recipeeTextBox);
+		this.add(this.recipeeText);
+		this.recipeeText.set_text("Souper Soup Reicpee:  \r\n\t\t\t\t\t\t\t18 Carrots\r\n\t\t\t\t\t\t\t17 Potatoes\r\n\t\t\t\t\t\t\t4 Bottles of Milk\r\n\t\t\t\t\t\t\t9 Onions\r\n\t\t\t\t\t\t\t3 Parts Souper Spice\r\n\t\t\t\t\t\t\tGather Ingredients and add to the pot to make the Souper Soup and become a Souper Chef!\r\n\t\t\t\t\t\t\tEnter to Exit");
+	}
+	,update: function(elapsed) {
+		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.hero,this.recipeeIcon,$bind(this,this.DisplayRecipee));
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(13,_this.status)) {
+			this.recipeeTextBox.kill();
+			this.recipeeText.kill();
+		}
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
+			var nextState = new MapScene(this.inventory);
+			if(flixel_FlxG.game._state.switchTo(nextState)) {
+				flixel_FlxG.game._requestedState = nextState;
+			}
+		}
+		flixel_FlxState.prototype.update.call(this,elapsed);
+	}
+	,__class__: FlowerInstructionField
+});
+var GeneralStore = function(incomingInventory) {
+	this.randomYLocation = 0;
+	this.randomXLocation = 0;
+	flixel_FlxState.call(this);
+	this.inventory = incomingInventory;
+};
+$hxClasses["GeneralStore"] = GeneralStore;
+GeneralStore.__name__ = "GeneralStore";
+GeneralStore.__super__ = flixel_FlxState;
+GeneralStore.prototype = $extend(flixel_FlxState.prototype,{
+	inventory: null
+	,carrotNum: null
+	,potatoNum: null
+	,milkNum: null
+	,onionNum: null
+	,souperSpiceNum: null
+	,redFlowerNum: null
+	,yellowFlowerNum: null
+	,blueFlowerNum: null
+	,returnDisplayBox: null
+	,inventoryDisplayBox: null
+	,hero: null
+	,onionGal: null
+	,checkoutCounterBox: null
+	,talkBox: null
+	,yellowFlowerTrade: null
+	,redFlowerTrade: null
+	,walls: null
+	,redFlowers: null
+	,yellowFlowers: null
+	,blueFlowers: null
+	,randomXLocation: null
+	,randomYLocation: null
+	,textBox: null
+	,instructions: null
+	,instructionStart: null
+	,create: function() {
+		flixel_FlxState.prototype.create.call(this);
+		this.walls = new flixel_group_FlxTypedGroup();
+		this.walls.add(new item_Wall(0,0,1400,70));
+		this.walls.add(new item_Wall(0,0,1,1000));
+		this.walls.add(new item_Wall(0,999,1400,1));
+		this.walls.add(new item_Wall(1399,0,1,1000));
+		this.add(this.walls);
+		this.instructionStart = new item_Wall(0,0,1400,1000);
+		this.add(this.instructionStart);
+		this.add(new flixel_FlxSprite(0,0,"assets/images/Flower_Field.png"));
+		this.onionGal = new character_NPC(800,200,"assets/images/onionLadySouth.png");
+		this.add(this.onionGal);
+		this.yellowFlowerTrade = new item_Ingredient(100,400,"assets/images/souperSpice.png");
+		this.add(this.yellowFlowerTrade);
+		this.redFlowerTrade = new item_Ingredient(250,400,"assets/images/onion.png");
+		this.add(this.redFlowerTrade);
+		this.yellowFlowers = new flixel_group_FlxTypedGroup();
+		var _g = 0;
+		while(_g < 30) {
+			var i = _g++;
+			this.randomizeLocation();
+			this.yellowFlowers.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,"assets/images/Yellow_Flower.png"));
+		}
+		this.add(this.yellowFlowers);
+		this.blueFlowers = new flixel_group_FlxTypedGroup();
+		var _g = 0;
+		while(_g < 30) {
+			var i = _g++;
+			this.randomizeLocation();
+			this.blueFlowers.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,"assets/images/Blue_Flower.png"));
+		}
+		this.add(this.blueFlowers);
+		this.redFlowers = new flixel_group_FlxTypedGroup();
+		var _g = 0;
+		while(_g < 30) {
+			var i = _g++;
+			this.randomizeLocation();
+			this.redFlowers.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,"assets/images/Red_Flower.png"));
+		}
+		this.add(this.redFlowers);
+		this.hero = new character_Hero(50,250);
+		this.add(this.hero);
+		this.textBox = new item_Ingredient(25,400,"assets/images/Text_Box.png");
+		this.instructions = new flixel_text_FlxText(50,425,1300," ",24);
+		this.returnDisplayBox = new item_Wall(0,0,1400,70);
+		this.returnDisplayBox.set_color(-8355712);
+		this.add(this.returnDisplayBox);
+		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
+		this.add(new flixel_FlxSprite(425,10,"assets/images/Carrot.png"));
+		this.add(new flixel_FlxSprite(540,10,"assets/images/Potato.png"));
+		this.add(new flixel_FlxSprite(655,10,"assets/images/milk.png"));
+		this.add(new flixel_FlxSprite(770,10,"assets/images/onion.png"));
+		this.add(new flixel_FlxSprite(885,10,"assets/images/souperSpice.png"));
+		this.add(new flixel_FlxSprite(1000,10,"assets/images/redFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1115,10,"assets/images/yellowFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1230,10,"assets/images/blueFlowerIcon.png"));
+		this.carrotNum = new flixel_text_FlxText(475,20,0," " + this.inventory.carrots,24,true);
+		this.potatoNum = new flixel_text_FlxText(590,20,0," " + this.inventory.potatoes,24,true);
+		this.milkNum = new flixel_text_FlxText(705,20,0," " + this.inventory.milk,24,true);
+		this.onionNum = new flixel_text_FlxText(820,20,0," " + this.inventory.onions,24,true);
+		this.souperSpiceNum = new flixel_text_FlxText(935,20,0," " + this.inventory.souperSpice,24,true);
+		this.redFlowerNum = new flixel_text_FlxText(1050,20,0," " + this.inventory.redFlower,24,true);
+		this.yellowFlowerNum = new flixel_text_FlxText(1165,20,0," " + this.inventory.yellowFlower,24,true);
+		this.blueFlowerNum = new flixel_text_FlxText(1280,20,0," " + this.inventory.blueFlower,24,true);
+		this.add(this.inventoryDisplayBox);
+		this.add(this.carrotNum);
+		this.add(this.potatoNum);
+		this.add(this.milkNum);
+		this.add(this.onionNum);
+		this.add(this.souperSpiceNum);
+		this.add(this.redFlowerNum);
+		this.add(this.yellowFlowerNum);
+		this.add(this.blueFlowerNum);
+	}
+	,backToMap: function() {
+		var nextState = new MapScene(this.inventory);
+		if(flixel_FlxG.game._state.switchTo(nextState)) {
+			flixel_FlxG.game._requestedState = nextState;
+		}
+	}
+	,randomizeLocation: function() {
+		this.randomXLocation = flixel_FlxG.random.float(0,1300);
+		this.randomYLocation = flixel_FlxG.random.float(550,900);
+	}
+	,AddRedFlower: function(obj1,obj2) {
+		obj1.kill();
+		this.inventory.addRedFlowers(1);
+		this.redFlowerNum.set_text(" " + this.inventory.redFlower);
+	}
+	,AddYellowFlower: function(obj1,obj2) {
+		obj1.kill();
+		this.inventory.addYellowFlowers(1);
+		this.yellowFlowerNum.set_text(" " + this.inventory.yellowFlower);
+	}
+	,AddBlueFlower: function(obj1,obj2) {
+		obj1.kill();
+		this.inventory.addBlueFlowers(1);
+		this.blueFlowerNum.set_text(" " + this.inventory.blueFlower);
+	}
+	,RedFlowerForOnion: function(obj1,obj2) {
+		if(this.inventory.redFlower >= 27) {
+			this.inventory.consumeRedFlowers(27);
+			this.inventory.addOnions(9);
+			this.onionNum.set_text(" " + this.inventory.onions);
+			this.redFlowerNum.set_text(" " + this.inventory.redFlower);
+			obj1.kill();
+		}
+	}
+	,YellowFlowerForSouperSpice: function(obj1,obj2) {
+		if(this.inventory.yellowFlower >= 81) {
+			this.inventory.consumeYellowFlowers(81);
+			this.inventory.addSouperSpice(3);
+			this.souperSpiceNum.set_text(" " + this.inventory.souperSpice);
+			this.yellowFlowerNum.set_text(" " + this.inventory.yellowFlower);
+			obj1.kill();
+		}
+	}
+	,DisplayInstructions: function(obj1,obj2) {
+		this.add(this.textBox);
+		this.add(this.instructions);
+		this.instructions.set_text("Hello, welcome to the General Store. Pick some flowers to trade for Onions and Souper Spice. 27 red flowers for onions, and 81 yellow flowers for Souper Spice. Walk to the Onions and Spice when you have enough flowers to trade. Enter to exit");
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(13,_this.status)) {
+			this.textBox.kill();
+			this.instructions.kill();
+		}
+	}
+	,update: function(elapsed) {
+		flixel_FlxG.overlap(this.redFlowers,this.hero,$bind(this,this.AddRedFlower));
+		flixel_FlxG.overlap(this.yellowFlowers,this.hero,$bind(this,this.AddYellowFlower));
+		flixel_FlxG.overlap(this.blueFlowers,this.hero,$bind(this,this.AddBlueFlower));
+		flixel_FlxG.overlap(this.redFlowerTrade,this.hero,$bind(this,this.RedFlowerForOnion));
+		flixel_FlxG.overlap(this.yellowFlowerTrade,this.hero,$bind(this,this.YellowFlowerForSouperSpice));
+		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.instructionStart,this.hero,$bind(this,this.DisplayInstructions));
+		var _this = flixel_FlxG.keys.justReleased;
+		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
+			var nextState = new MapScene(this.inventory);
+			if(flixel_FlxG.game._state.switchTo(nextState)) {
+				flixel_FlxG.game._requestedState = nextState;
+			}
+		}
+		flixel_FlxState.prototype.update.call(this,elapsed);
+	}
+	,__class__: GeneralStore
+});
+var HxOverrides = function() { };
+$hxClasses["HxOverrides"] = HxOverrides;
+HxOverrides.__name__ = "HxOverrides";
+HxOverrides.strDate = function(s) {
+	switch(s.length) {
+	case 8:
+		var k = s.split(":");
+		var d = new Date();
+		d["setTime"](0);
+		d["setUTCHours"](k[0]);
+		d["setUTCMinutes"](k[1]);
+		d["setUTCSeconds"](k[2]);
+		return d;
+	case 10:
+		var k = s.split("-");
+		return new Date(k[0],k[1] - 1,k[2],0,0,0);
+	case 19:
+		var k = s.split(" ");
+		var y = k[0].split("-");
+		var t = k[1].split(":");
+		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
+	default:
+		throw haxe_Exception.thrown("Invalid date format : " + s);
+	}
+};
+HxOverrides.cca = function(s,index) {
+	var x = s.charCodeAt(index);
+	if(x != x) {
+		return undefined;
+	}
+	return x;
+};
+HxOverrides.substr = function(s,pos,len) {
+	if(len == null) {
+		len = s.length;
+	} else if(len < 0) {
+		if(pos == 0) {
+			len = s.length + len;
+		} else {
+			return "";
+		}
+	}
+	return s.substr(pos,len);
+};
+HxOverrides.remove = function(a,obj) {
+	var i = a.indexOf(obj);
+	if(i == -1) {
+		return false;
+	}
+	a.splice(i,1);
+	return true;
+};
+HxOverrides.now = function() {
+	return Date.now();
+};
+var IntIterator = function(min,max) {
+	this.min = min;
+	this.max = max;
+};
+$hxClasses["IntIterator"] = IntIterator;
+IntIterator.__name__ = "IntIterator";
+IntIterator.prototype = {
+	min: null
+	,max: null
+	,hasNext: function() {
+		return this.min < this.max;
+	}
+	,next: function() {
+		return this.min++;
+	}
+	,__class__: IntIterator
+};
+var Lambda = function() { };
+$hxClasses["Lambda"] = Lambda;
+Lambda.__name__ = "Lambda";
+Lambda.array = function(it) {
+	var a = [];
+	var i = $getIterator(it);
+	while(i.hasNext()) {
+		var i1 = i.next();
+		a.push(i1);
+	}
+	return a;
+};
+var ManifestResources = function() { };
+$hxClasses["ManifestResources"] = ManifestResources;
+ManifestResources.__name__ = "ManifestResources";
+ManifestResources.preloadLibraries = null;
+ManifestResources.preloadLibraryNames = null;
+ManifestResources.rootPath = null;
+ManifestResources.init = function(config) {
+	ManifestResources.preloadLibraries = [];
+	ManifestResources.preloadLibraryNames = [];
+	ManifestResources.rootPath = null;
+	if(config != null && Object.prototype.hasOwnProperty.call(config,"rootPath")) {
+		ManifestResources.rootPath = Reflect.field(config,"rootPath");
+	}
+	if(ManifestResources.rootPath == null) {
+		ManifestResources.rootPath = "./";
+	}
+	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf);
+	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf);
+	var bundle;
+	var data = "{\"name\":null,\"assets\":\"aoy4:pathy34:assets%2Fdata%2Fdata-goes-here.txty4:sizezy4:typey4:TEXTy2:idR1y7:preloadtgoR0y36:assets%2Fimages%2FblueFlowerIcon.pngR2i4767R3y5:IMAGER5R7R6tgoR0y33:assets%2Fimages%2FBlue_Flower.pngR2i5323R3R8R5R9R6tgoR0y28:assets%2Fimages%2FCarrot.pngR2i3852R3R8R5R10R6tgoR0y32:assets%2Fimages%2FcarrotFarm.pngR2i2295106R3R8R5R11R6tgoR0y32:assets%2Fimages%2FcarrotGirl.pngR2i7446R3R8R5R12R6tgoR0y37:assets%2Fimages%2FcarrotGirlLarge.pngR2i102925R3R8R5R13R6tgoR0y31:assets%2Fimages%2FcarrotTop.pngR2i5341R3R8R5R14R6tgoR0y37:assets%2Fimages%2FCarrot_Map_Icon.pngR2i20908R3R8R5R15R6tgoR0y43:assets%2Fimages%2FCarrot_Map_Icon__Text.pngR2i28246R3R8R5R16R6tgoR0y26:assets%2Fimages%2FCows.pngR2i1884252R3R8R5R17R6tgoR0y34:assets%2Fimages%2FFlower_Field.pngR2i1659245R3R8R5R18R6tgoR0y38:assets%2Fimages%2FFlower_Fieldlady.pngR2i1149568R3R8R5R19R6tgoR0y46:assets%2Fimages%2FFlower_FieldlladyTalking.pngR2i1149409R3R8R5R20R6tgoR0y37:assets%2Fimages%2FFlower_Map_Icon.pngR2i18251R3R8R5R21R6tgoR0y43:assets%2Fimages%2FFlower_Map_Icon__Text.pngR2i24654R3R8R5R22R6tgoR0y34:assets%2Fimages%2FfullMilkPail.pngR2i9791R3R8R5R23R6tgoR0y26:assets%2Fimages%2Fgirl.pngR2i55847R3R8R5R24R6tgoR0y31:assets%2Fimages%2FgirlSmall.pngR2i7983R3R8R5R25R6tgoR0y38:assets%2Fimages%2FglowingCarrotTop.pngR2i17553R3R8R5R26R6tgoR0y30:assets%2Fimages%2FheroEast.pngR2i5411R3R8R5R27R6tgoR0y31:assets%2Fimages%2FheroLarge.pngR2i48690R3R8R5R28R6tgoR0y31:assets%2Fimages%2FheroNorth.pngR2i5270R3R8R5R29R6tgoR0y31:assets%2Fimages%2FheroSouth.pngR2i5519R3R8R5R30R6tgoR0y30:assets%2Fimages%2FheroWest.pngR2i5974R3R8R5R31R6tgoR0y25:assets%2Fimages%2FMap.pngR2i2222949R3R8R5R32R6tgoR0y34:assets%2Fimages%2FmapWithIcons.pngR2i2314226R3R8R5R33R6tgoR0y26:assets%2Fimages%2Fmilk.pngR2i2925R3R8R5R34R6tgoR0y30:assets%2Fimages%2FmilkPail.pngR2i9800R3R8R5R35R6tgoR0y35:assets%2Fimages%2FMilk_Map_Icon.pngR2i12850R3R8R5R36R6tgoR0y41:assets%2Fimages%2FMilk_Map_Icon__Text.pngR2i19000R3R8R5R37R6tgoR0y27:assets%2Fimages%2Fonion.pngR2i4256R3R8R5R38R6tgoR0y36:assets%2Fimages%2FonionLadySouth.pngR2i6752R3R8R5R39R6tgoR0y36:assets%2Fimages%2FOnion_Lady%201.pngR2i5865R3R8R5R40R6tgoR0y36:assets%2Fimages%2FOnion_Lady%202.pngR2i5964R3R8R5R41R6tgoR0y32:assets%2Fimages%2FOnion_Lady.pngR2i5345R3R8R5R42R6tgoR0y36:assets%2Fimages%2FOnion_Map_Icon.pngR2i12412R3R8R5R43R6tgoR0y42:assets%2Fimages%2FOnion_Map_Icon__Text.pngR2i17790R3R8R5R44R6tgoR0y25:assets%2Fimages%2FPot.pngR2i10537R3R8R5R45R6tgoR0y28:assets%2Fimages%2FPotato.pngR2i4118R3R8R5R46R6tgoR0y32:assets%2Fimages%2FpotatoEast.pngR2i5074R3R8R5R47R6tgoR0y33:assets%2Fimages%2FpotatoNorth.pngR2i3648R3R8R5R48R6tgoR0y33:assets%2Fimages%2FPotatoSouth.pngR2i5250R3R8R5R49R6tgoR0y32:assets%2Fimages%2FpotatoWest.pngR2i4948R3R8R5R50R6tgoR0y34:assets%2Fimages%2FPotato_Bush1.pngR2i11727R3R8R5R51R6tgoR0y34:assets%2Fimages%2FPotato_Bush2.pngR2i11901R3R8R5R52R6tgoR0y34:assets%2Fimages%2FPotato_Bush3.pngR2i9346R3R8R5R53R6tgoR0y34:assets%2Fimages%2FPotato_Bush4.pngR2i48319R3R8R5R54R6tgoR0y34:assets%2Fimages%2FPotato_Field.pngR2i1427120R3R8R5R55R6tgoR0y41:assets%2Fimages%2FPotato_Fieldman%201.pngR2i1018213R3R8R5R56R6tgoR0y37:assets%2Fimages%2FPotato_Fieldman.pngR2i1017654R3R8R5R57R6tgoR0y37:assets%2Fimages%2FPotato_Map_Icon.pngR2i16867R3R8R5R58R6tgoR0y43:assets%2Fimages%2FPotato_Map_Icon__Text.pngR2i23662R3R8R5R59R6tgoR0y34:assets%2Fimages%2FPot_Map_Icon.pngR2i38668R3R8R5R60R6tgoR0y40:assets%2Fimages%2FPot_Map_Icon__Text.pngR2i43813R3R8R5R61R6tgoR0y42:assets%2Fimages%2FPress_Enter_To_Start.pngR2i34738R3R8R5R62R6tgoR0y35:assets%2Fimages%2FredFlowerIcon.pngR2i4682R3R8R5R63R6tgoR0y32:assets%2Fimages%2FRed_Flower.pngR2i5186R3R8R5R64R6tgoR0y35:assets%2Fimages%2FRed_Flower.png%7ER2i5186R3y6:BINARYR5R65R6tgoR0y33:assets%2Fimages%2FsouperSpice.pngR2i3213R3R8R5R67R6tgoR0y34:assets%2Fimages%2FSoupLocation.pngR2i2032991R3R8R5R68R6tgoR0y34:assets%2Fimages%2FStart_Screen.pngR2i800318R3R8R5R69R6tgoR0y39:assets%2Fimages%2FStart_Screenenter.pngR2i825765R3R8R5R70R6tgoR0y30:assets%2Fimages%2FText_Box.pngR2i7974R3R8R5R71R6tgoR0y38:assets%2Fimages%2FyellowFlowerIcon.pngR2i4536R3R8R5R72R6tgoR0y35:assets%2Fimages%2FYellow_Flower.pngR2i5173R3R8R5R73R6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R74R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R75R6tgoR2i2114R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3y9:pathGroupaR77y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R76R5y28:flixel%2Fsounds%2Fflixel.mp3R78aR80y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i5794R3y5:SOUNDR5R79R78aR77R79hgoR2i33629R3R82R5R81R78aR80R81hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R83R84y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i519R3R8R5R89R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i3280R3R8R5R90R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
+	var manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
+	var library = lime_utils_AssetLibrary.fromManifest(manifest);
+	lime_utils_Assets.registerLibrary("default",library);
+	library = lime_utils_Assets.getLibrary("default");
+	if(library != null) {
+		ManifestResources.preloadLibraries.push(library);
+	} else {
+		ManifestResources.preloadLibraryNames.push("default");
+	}
+};
+var lime_text_Font = function(name) {
+	if(name != null) {
+		this.name = name;
+	}
+	if(!this.__init) {
+		if(this.ascender == undefined) {
+			this.ascender = 0;
+		}
+		if(this.descender == undefined) {
+			this.descender = 0;
+		}
+		if(this.height == undefined) {
+			this.height = 0;
+		}
+		if(this.numGlyphs == undefined) {
+			this.numGlyphs = 0;
+		}
+		if(this.underlinePosition == undefined) {
+			this.underlinePosition = 0;
+		}
+		if(this.underlineThickness == undefined) {
+			this.underlineThickness = 0;
+		}
+		if(this.unitsPerEM == undefined) {
+			this.unitsPerEM = 0;
+		}
+		if(this.__fontID != null) {
+			if(lime_utils_Assets.isLocal(this.__fontID)) {
+				this.__fromBytes(lime_utils_Assets.getBytes(this.__fontID));
+			}
+		} else if(this.__fontPath != null) {
+			this.__fromFile(this.__fontPath);
+		}
+	}
+};
+$hxClasses["lime.text.Font"] = lime_text_Font;
+lime_text_Font.__name__ = "lime.text.Font";
+lime_text_Font.fromBytes = function(bytes) {
+	if(bytes == null) {
+		return null;
+	}
+	var font = new lime_text_Font();
+	font.__fromBytes(bytes);
+	return font;
+};
+lime_text_Font.fromFile = function(path) {
+	if(path == null) {
+		return null;
+	}
+	var font = new lime_text_Font();
+	font.__fromFile(path);
+	return font;
+};
+lime_text_Font.loadFromBytes = function(bytes) {
+	return lime_app_Future.withValue(lime_text_Font.fromBytes(bytes));
+};
+lime_text_Font.loadFromFile = function(path) {
+	var request = new lime_net__$HTTPRequest_$lime_$text_$Font();
+	return request.load(path).then(function(font) {
+		if(font != null) {
+			return lime_app_Future.withValue(font);
+		} else {
+			return lime_app_Future.withError("");
+		}
+	});
+};
+lime_text_Font.loadFromName = function(path) {
+	var font = new lime_text_Font();
+	return font.__loadFromName(path);
+};
+lime_text_Font.__measureFontNode = function(fontFamily) {
+	var node = window.document.createElement("span");
+	node.setAttribute("aria-hidden","true");
+	var text = window.document.createTextNode("BESbswy");
+	node.appendChild(text);
+	var style = node.style;
+	style.display = "block";
+	style.position = "absolute";
+	style.top = "-9999px";
+	style.left = "-9999px";
+	style.fontSize = "300px";
+	style.width = "auto";
+	style.height = "auto";
+	style.lineHeight = "normal";
+	style.margin = "0";
+	style.padding = "0";
+	style.fontVariant = "normal";
+	style.whiteSpace = "nowrap";
+	style.fontFamily = fontFamily;
+	window.document.body.appendChild(node);
+	return node;
+};
+lime_text_Font.prototype = {
+	ascender: null
+	,descender: null
+	,height: null
+	,name: null
+	,numGlyphs: null
+	,src: null
+	,underlinePosition: null
+	,underlineThickness: null
+	,unitsPerEM: null
+	,__fontID: null
+	,__fontPath: null
+	,__init: null
+	,decompose: function() {
+		return null;
+	}
+	,getGlyph: function(character) {
+		return -1;
+	}
+	,getGlyphs: function(characters) {
+		if(characters == null) {
+			characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^`'\"/\\&*()[]{}<>|:;_-+=?,. ";
+		}
+		return null;
+	}
+	,getGlyphMetrics: function(glyph) {
+		return null;
+	}
+	,renderGlyph: function(glyph,fontSize) {
+		return null;
+	}
+	,renderGlyphs: function(glyphs,fontSize) {
+		return null;
+	}
+	,__copyFrom: function(other) {
+		if(other != null) {
+			this.ascender = other.ascender;
+			this.descender = other.descender;
+			this.height = other.height;
+			this.name = other.name;
+			this.numGlyphs = other.numGlyphs;
+			this.src = other.src;
+			this.underlinePosition = other.underlinePosition;
+			this.underlineThickness = other.underlineThickness;
+			this.unitsPerEM = other.unitsPerEM;
+			this.__fontID = other.__fontID;
+			this.__fontPath = other.__fontPath;
+			this.__init = true;
+		}
+	}
+	,__fromBytes: function(bytes) {
+		this.__fontPath = null;
+	}
+	,__fromFile: function(path) {
+		this.__fontPath = path;
+	}
+	,__initializeSource: function() {
+		this.__init = true;
+	}
+	,__loadFromName: function(name) {
+		var _gthis = this;
+		var promise = new lime_app_Promise();
+		this.name = name;
+		var userAgent = $global.navigator.userAgent.toLowerCase();
+		var isSafari = userAgent.indexOf(" safari/") >= 0 && userAgent.indexOf(" chrome/") < 0;
+		var isUIWebView = new EReg("(iPhone|iPod|iPad).*AppleWebKit(?!.*Version)","i").match(userAgent);
+		if(!isSafari && !isUIWebView && (window.document.fonts && ($_=window.document.fonts,$bind($_,$_.load)))) {
+			window.document.fonts.load("1em '" + name + "'").then(function(_) {
+				promise.complete(_gthis);
+			},function(_) {
+				lime_utils_Log.warn("Could not load web font \"" + name + "\"",{ fileName : "lime/text/Font.hx", lineNumber : 513, className : "lime.text.Font", methodName : "__loadFromName"});
+				promise.complete(_gthis);
+			});
+		} else {
+			var node1 = lime_text_Font.__measureFontNode("'" + name + "', sans-serif");
+			var node2 = lime_text_Font.__measureFontNode("'" + name + "', serif");
+			var width1 = node1.offsetWidth;
+			var width2 = node2.offsetWidth;
+			var interval = -1;
+			var timeout = 3000;
+			var intervalLength = 50;
+			var intervalCount = 0;
+			var loaded;
+			var timeExpired;
+			var checkFont = function() {
+				intervalCount += 1;
+				loaded = node1.offsetWidth != width1 || node2.offsetWidth != width2;
+				timeExpired = intervalCount * intervalLength >= timeout;
+				if(loaded || timeExpired) {
+					window.clearInterval(interval);
+					node1.parentNode.removeChild(node1);
+					node2.parentNode.removeChild(node2);
+					node1 = null;
+					node2 = null;
+					if(timeExpired) {
+						lime_utils_Log.warn("Could not load web font \"" + name + "\"",{ fileName : "lime/text/Font.hx", lineNumber : 548, className : "lime.text.Font", methodName : "__loadFromName"});
+					}
+					promise.complete(_gthis);
+				}
+			};
+			interval = window.setInterval(checkFont,intervalLength);
+		}
+		return promise.future;
+	}
+	,__setSize: function(size) {
+	}
+	,__class__: lime_text_Font
+};
+var _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf = $hx_exports["__ASSET__flixel_fonts_nokiafc22_ttf"] = function() {
+	this.ascender = 2048;
+	this.descender = -512;
+	this.height = 2816;
+	this.numGlyphs = 172;
+	this.underlinePosition = -640;
+	this.underlineThickness = 256;
+	this.unitsPerEM = 2048;
+	this.name = "Nokia Cellphone FC Small";
+	lime_text_Font.call(this);
+};
+$hxClasses["__ASSET__flixel_fonts_nokiafc22_ttf"] = _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf;
+_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.__name__ = "__ASSET__flixel_fonts_nokiafc22_ttf";
+_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.__super__ = lime_text_Font;
+_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.prototype = $extend(lime_text_Font.prototype,{
+	__class__: _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf
+});
+var _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf = $hx_exports["__ASSET__flixel_fonts_monsterrat_ttf"] = function() {
+	this.ascender = 968;
+	this.descender = -251;
+	this.height = 1219;
+	this.numGlyphs = 263;
+	this.underlinePosition = -150;
+	this.underlineThickness = 50;
+	this.unitsPerEM = 1000;
+	this.name = "Monsterrat";
+	lime_text_Font.call(this);
+};
+$hxClasses["__ASSET__flixel_fonts_monsterrat_ttf"] = _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf;
+_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.__name__ = "__ASSET__flixel_fonts_monsterrat_ttf";
+_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.__super__ = lime_text_Font;
+_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.prototype = $extend(lime_text_Font.prototype,{
+	__class__: _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf
+});
+var openfl_text_Font = function(name) {
+	lime_text_Font.call(this,name);
+};
+$hxClasses["openfl.text.Font"] = openfl_text_Font;
+openfl_text_Font.__name__ = "openfl.text.Font";
+openfl_text_Font.enumerateFonts = function(enumerateDeviceFonts) {
+	if(enumerateDeviceFonts == null) {
+		enumerateDeviceFonts = false;
+	}
+	return openfl_text_Font.__registeredFonts;
+};
+openfl_text_Font.fromBytes = function(bytes) {
+	var font = new openfl_text_Font();
+	font.__fromBytes(openfl_utils_ByteArray.toBytes(bytes));
+	return font;
+};
+openfl_text_Font.fromFile = function(path) {
+	var font = new openfl_text_Font();
+	font.__fromFile(path);
+	return font;
+};
+openfl_text_Font.loadFromBytes = function(bytes) {
+	return lime_text_Font.loadFromBytes(openfl_utils_ByteArray.toBytes(bytes)).then(function(limeFont) {
+		var font = new openfl_text_Font();
+		font.__fromLimeFont(limeFont);
+		return lime_app_Future.withValue(font);
+	});
+};
+openfl_text_Font.loadFromFile = function(path) {
+	return lime_text_Font.loadFromFile(path).then(function(limeFont) {
+		var font = new openfl_text_Font();
+		font.__fromLimeFont(limeFont);
+		return lime_app_Future.withValue(font);
+	});
+};
+openfl_text_Font.loadFromName = function(path) {
+	return lime_text_Font.loadFromName(path).then(function(limeFont) {
+		var font = new openfl_text_Font();
+		font.__fromLimeFont(limeFont);
+		return lime_app_Future.withValue(font);
+	});
+};
+openfl_text_Font.registerFont = function(font) {
+	var instance = null;
+	if(js_Boot.getClass(font) == null) {
+		instance = js_Boot.__cast(Type.createInstance(font,[]) , openfl_text_Font);
+	} else {
+		instance = js_Boot.__cast(font , openfl_text_Font);
+	}
+	if(instance != null) {
+		openfl_text_Font.__registeredFonts.push(instance);
+		openfl_text_Font.__fontByName.h[instance.name] = instance;
+	}
+};
+openfl_text_Font.__super__ = lime_text_Font;
+openfl_text_Font.prototype = $extend(lime_text_Font.prototype,{
+	fontStyle: null
+	,fontType: null
+	,__initialized: null
+	,__fromLimeFont: function(font) {
+		this.__copyFrom(font);
+	}
+	,__initialize: function() {
+		return this.__initialized;
+	}
+	,get_fontName: function() {
+		return this.name;
+	}
+	,set_fontName: function(value) {
+		return this.name = value;
+	}
+	,__class__: openfl_text_Font
+	,__properties__: {set_fontName:"set_fontName",get_fontName:"get_fontName"}
+});
+var _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf = $hx_exports["__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf"] = function() {
+	this.__fromLimeFont(new _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf());
+	openfl_text_Font.call(this);
+};
+$hxClasses["__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf"] = _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf;
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.__name__ = "__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf";
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.__super__ = openfl_text_Font;
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.prototype = $extend(openfl_text_Font.prototype,{
+	__class__: _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf
+});
+var _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf = $hx_exports["__ASSET__OPENFL__flixel_fonts_monsterrat_ttf"] = function() {
+	this.__fromLimeFont(new _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf());
+	openfl_text_Font.call(this);
+};
+$hxClasses["__ASSET__OPENFL__flixel_fonts_monsterrat_ttf"] = _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf;
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.__name__ = "__ASSET__OPENFL__flixel_fonts_monsterrat_ttf";
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.__super__ = openfl_text_Font;
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.prototype = $extend(openfl_text_Font.prototype,{
+	__class__: _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf
+});
 var MapScene = function(incomingInventory) {
 	flixel_FlxState.call(this);
 	if(incomingInventory == null) {
@@ -4731,52 +5372,63 @@ MapScene.prototype = $extend(flixel_FlxState.prototype,{
 	,souperSpiceNum: null
 	,redFlowerNum: null
 	,yellowFlowerNum: null
+	,blueFlowerNum: null
 	,inventoryDisplayBox: null
 	,hero: null
 	,walls: null
-	,scene1Graphic: null
-	,scene2Graphic: null
-	,scene3Graphic: null
-	,scene4Graphic: null
-	,scene5Graphic: null
+	,returnDisplayBox: null
+	,SoupScreenGraphic: null
+	,CarrotFieldGraphic: null
+	,PotatoFieldGraphic: null
+	,MilkBarnGraphic: null
+	,GeneralStoreGraphic: null
 	,FlowerInstructionFieldGraphic: null
 	,create: function() {
 		flixel_FlxState.prototype.create.call(this);
 		this.walls = new flixel_group_FlxTypedGroup();
-		this.walls.add(new item_Wall(0,0,1400,1));
+		this.walls.add(new item_Wall(0,0,1400,70));
 		this.walls.add(new item_Wall(0,0,1,1000));
 		this.walls.add(new item_Wall(1400,0,1,1000));
-		this.walls.add(new item_Wall(1400,1000,1400,1));
+		this.walls.add(new item_Wall(0,1000,1400,1));
 		this.add(this.walls);
-		this.scene1Graphic = new flixel_FlxSprite(100,700);
-		this.scene1Graphic.loadGraphic("assets/images/Pot.png",false,150,150);
-		this.scene2Graphic = new flixel_FlxSprite(300,700);
-		this.scene2Graphic.loadGraphic("assets/images/Carrot.png",false,150,150);
-		this.scene3Graphic = new flixel_FlxSprite(500,700);
-		this.scene3Graphic.loadGraphic("assets/images/Potato.png",false,150,150);
-		this.scene4Graphic = new flixel_FlxSprite(700,700);
-		this.scene4Graphic.loadGraphic("assets/images/milk.png",false,150,150);
-		this.scene5Graphic = new flixel_FlxSprite(900,700);
-		this.scene5Graphic.loadGraphic("assets/images/onion.png",false,150,150);
-		this.FlowerInstructionFieldGraphic = new flixel_FlxSprite(1100,700);
-		this.FlowerInstructionFieldGraphic.loadGraphic("assets/images/redflower.png",false,150,150);
-		this.add(this.scene1Graphic);
-		this.add(this.scene2Graphic);
-		this.add(this.scene3Graphic);
-		this.add(this.scene4Graphic);
-		this.add(this.scene5Graphic);
+		this.add(new flixel_FlxSprite(0,0,"assets/images/Map.png"));
+		this.SoupScreenGraphic = new flixel_FlxSprite(1100,770);
+		this.SoupScreenGraphic.loadGraphic("assets/images/Pot_Map_Icon.png",false,150,150);
+		this.CarrotFieldGraphic = new flixel_FlxSprite(850,350);
+		this.CarrotFieldGraphic.loadGraphic("assets/images/Carrot_Map_Icon.png",false,150,150);
+		this.PotatoFieldGraphic = new flixel_FlxSprite(570,650);
+		this.PotatoFieldGraphic.loadGraphic("assets/images/Potato_Map_Icon.png",false,150,150);
+		this.MilkBarnGraphic = new flixel_FlxSprite(1170,200);
+		this.MilkBarnGraphic.loadGraphic("assets/images/Milk_Map_Icon.png",false,150,150);
+		this.GeneralStoreGraphic = new flixel_FlxSprite(370,120);
+		this.GeneralStoreGraphic.loadGraphic("assets/images/Onion_Map_Icon.png",false,150,150);
+		this.FlowerInstructionFieldGraphic = new flixel_FlxSprite(100,450);
+		this.FlowerInstructionFieldGraphic.loadGraphic("assets/images/Flower_Map_Icon.png",false,150,150);
+		this.add(this.SoupScreenGraphic);
+		this.add(this.CarrotFieldGraphic);
+		this.add(this.PotatoFieldGraphic);
+		this.add(this.MilkBarnGraphic);
+		this.add(this.GeneralStoreGraphic);
 		this.add(this.FlowerInstructionFieldGraphic);
-		this.add(new flixel_text_FlxText(200,500,0,"Gather Ingredients, then return to Campfire.",38));
-		this.add(new flixel_text_FlxText(250,550,0,"Walk to a Location to go to there",38));
-		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
-		this.inventoryDisplayBox.set_color(-8355712);
-		this.carrotNum = new flixel_text_FlxText(1100,20,0,"Carrots: " + this.inventory.carrots,24,true);
-		this.potatoNum = new flixel_text_FlxText(1100,50,0,"Potatoes: " + this.inventory.potatoes,24,true);
-		this.milkNum = new flixel_text_FlxText(1100,80,0,"Milk Bottle: " + this.inventory.milk,24,true);
-		this.onionNum = new flixel_text_FlxText(1100,110,0,"Onions: " + this.inventory.onions,24,true);
-		this.souperSpiceNum = new flixel_text_FlxText(1100,140,0,"Souper Spice: " + this.inventory.souperSpice,24,true);
-		this.redFlowerNum = new flixel_text_FlxText(1100,170,0,"Red Flowers: " + this.inventory.redFlower,24,true);
-		this.yellowFlowerNum = new flixel_text_FlxText(1100,200,0,"Yellow Flowers: " + this.inventory.yellowFlower,24,true);
+		this.returnDisplayBox = new item_Wall(0,0,1400,70);
+		this.returnDisplayBox.set_color(-8355712);
+		this.add(this.returnDisplayBox);
+		this.add(new flixel_FlxSprite(425,10,"assets/images/Carrot.png"));
+		this.add(new flixel_FlxSprite(540,10,"assets/images/Potato.png"));
+		this.add(new flixel_FlxSprite(655,10,"assets/images/milk.png"));
+		this.add(new flixel_FlxSprite(770,10,"assets/images/onion.png"));
+		this.add(new flixel_FlxSprite(885,10,"assets/images/souperSpice.png"));
+		this.add(new flixel_FlxSprite(1000,10,"assets/images/redFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1115,10,"assets/images/yellowFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1230,10,"assets/images/blueFlowerIcon.png"));
+		this.carrotNum = new flixel_text_FlxText(475,20,0," " + this.inventory.carrots,24,true);
+		this.potatoNum = new flixel_text_FlxText(590,20,0," " + this.inventory.potatoes,24,true);
+		this.milkNum = new flixel_text_FlxText(705,20,0," " + this.inventory.milk,24,true);
+		this.onionNum = new flixel_text_FlxText(820,20,0," " + this.inventory.onions,24,true);
+		this.souperSpiceNum = new flixel_text_FlxText(935,20,0," " + this.inventory.souperSpice,24,true);
+		this.redFlowerNum = new flixel_text_FlxText(1050,20,0," " + this.inventory.redFlower,24,true);
+		this.yellowFlowerNum = new flixel_text_FlxText(1165,20,0," " + this.inventory.yellowFlower,24,true);
+		this.blueFlowerNum = new flixel_text_FlxText(1280,20,0," " + this.inventory.blueFlower,24,true);
 		this.add(this.inventoryDisplayBox);
 		this.add(this.carrotNum);
 		this.add(this.potatoNum);
@@ -4785,35 +5437,36 @@ MapScene.prototype = $extend(flixel_FlxState.prototype,{
 		this.add(this.souperSpiceNum);
 		this.add(this.redFlowerNum);
 		this.add(this.yellowFlowerNum);
-		this.hero = new character_Hero(50,250);
+		this.add(this.blueFlowerNum);
+		this.hero = new character_Hero(50,800);
 		this.add(this.hero);
 	}
-	,goToScene1: function(obj1,obj2) {
-		var nextState = new Scene1(this.inventory);
+	,goToSoupScreen: function(obj1,obj2) {
+		var nextState = new SoupScreen(this.inventory);
 		if(flixel_FlxG.game._state.switchTo(nextState)) {
 			flixel_FlxG.game._requestedState = nextState;
 		}
 	}
-	,goToScene2: function(obj1,obj2) {
-		var nextState = new Scene2(this.inventory);
+	,goToCarrotField: function(obj1,obj2) {
+		var nextState = new CarrotField(this.inventory);
 		if(flixel_FlxG.game._state.switchTo(nextState)) {
 			flixel_FlxG.game._requestedState = nextState;
 		}
 	}
-	,goToScene3: function(obj1,obj2) {
-		var nextState = new Scene3(this.inventory);
+	,goToPotatoField: function(obj1,obj2) {
+		var nextState = new PotatoField(this.inventory);
 		if(flixel_FlxG.game._state.switchTo(nextState)) {
 			flixel_FlxG.game._requestedState = nextState;
 		}
 	}
-	,goToScene4: function(obj1,obj2) {
-		var nextState = new Scene4(this.inventory);
+	,goToMilkBarn: function(obj1,obj2) {
+		var nextState = new MilkBarn(this.inventory);
 		if(flixel_FlxG.game._state.switchTo(nextState)) {
 			flixel_FlxG.game._requestedState = nextState;
 		}
 	}
-	,goToScene5: function(obj1,obj2) {
-		var nextState = new Scene5(this.inventory);
+	,goToGeneralStore: function(obj1,obj2) {
+		var nextState = new GeneralStore(this.inventory);
 		if(flixel_FlxG.game._state.switchTo(nextState)) {
 			flixel_FlxG.game._requestedState = nextState;
 		}
@@ -4825,11 +5478,11 @@ MapScene.prototype = $extend(flixel_FlxState.prototype,{
 		}
 	}
 	,update: function(elapsed) {
-		flixel_FlxG.overlap(this.scene1Graphic,this.hero,$bind(this,this.goToScene1));
-		flixel_FlxG.overlap(this.scene2Graphic,this.hero,$bind(this,this.goToScene2));
-		flixel_FlxG.overlap(this.scene3Graphic,this.hero,$bind(this,this.goToScene3));
-		flixel_FlxG.overlap(this.scene4Graphic,this.hero,$bind(this,this.goToScene4));
-		flixel_FlxG.overlap(this.scene5Graphic,this.hero,$bind(this,this.goToScene5));
+		flixel_FlxG.overlap(this.SoupScreenGraphic,this.hero,$bind(this,this.goToSoupScreen));
+		flixel_FlxG.overlap(this.CarrotFieldGraphic,this.hero,$bind(this,this.goToCarrotField));
+		flixel_FlxG.overlap(this.PotatoFieldGraphic,this.hero,$bind(this,this.goToPotatoField));
+		flixel_FlxG.overlap(this.MilkBarnGraphic,this.hero,$bind(this,this.goToMilkBarn));
+		flixel_FlxG.overlap(this.GeneralStoreGraphic,this.hero,$bind(this,this.goToGeneralStore));
 		flixel_FlxG.overlap(this.FlowerInstructionFieldGraphic,this.hero,$bind(this,this.goToFlowerInstructionField));
 		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
 		flixel_FlxState.prototype.update.call(this,elapsed);
@@ -4837,6 +5490,400 @@ MapScene.prototype = $extend(flixel_FlxState.prototype,{
 	,__class__: MapScene
 });
 Math.__name__ = "Math";
+var MilkBarn = function(incomingInventory) {
+	this.fullPail = "assets/images/fullMilkPail.png";
+	this.emptyPail = "assets/images/milkPail.png";
+	this.emptyBucket2 = true;
+	this.emptyBucket1 = true;
+	this.pailFillingBuffer2 = 200;
+	this.pailFillingBuffer1 = 200;
+	this.milkCount = 0;
+	flixel_FlxState.call(this);
+	this.inventory = incomingInventory;
+};
+$hxClasses["MilkBarn"] = MilkBarn;
+MilkBarn.__name__ = "MilkBarn";
+MilkBarn.__super__ = flixel_FlxState;
+MilkBarn.prototype = $extend(flixel_FlxState.prototype,{
+	inventory: null
+	,carrotNum: null
+	,potatoNum: null
+	,milkNum: null
+	,onionNum: null
+	,souperSpiceNum: null
+	,redFlowerNum: null
+	,yellowFlowerNum: null
+	,blueFlowerNum: null
+	,inventoryDisplayBox: null
+	,returnDisplayBox: null
+	,hero: null
+	,milkCount: null
+	,walls: null
+	,wallForPail: null
+	,cows: null
+	,pail1: null
+	,pail2: null
+	,pailFillingBuffer1: null
+	,pailFillingBuffer2: null
+	,emptyBucket1: null
+	,emptyBucket2: null
+	,benchBox: null
+	,instructionStart: null
+	,textBox: null
+	,instructions: null
+	,milkLady: null
+	,emptyPail: null
+	,fullPail: null
+	,create: function() {
+		flixel_FlxState.prototype.create.call(this);
+		this.walls = new flixel_group_FlxTypedGroup();
+		this.walls.add(new item_Wall(0,0,1400,250));
+		this.walls.add(new item_Wall(0,0,10,1000));
+		this.walls.add(new item_Wall(0,990,1400,10));
+		this.walls.add(new item_Wall(1390,0,10,1000));
+		this.walls.add(new item_Wall(100,200,200,200));
+		this.add(this.walls);
+		this.wallForPail = new flixel_group_FlxTypedGroup();
+		this.wallForPail.add(new item_Wall(0,0,1400,400));
+		this.wallForPail.add(new item_Wall(0,0,110,1000));
+		this.wallForPail.add(new item_Wall(0,840,1400,160));
+		this.wallForPail.add(new item_Wall(1290,0,110,1000));
+		this.wallForPail.add(new item_Wall(100,200,350,350));
+		this.add(this.wallForPail);
+		this.cows = new flixel_group_FlxTypedGroup();
+		this.cows.add(new item_BackgroundBox(525,275,250,150));
+		this.cows.add(new item_BackgroundBox(1000,325,250,150));
+		this.cows.add(new item_BackgroundBox(1200,650,100,300));
+		this.add(this.cows);
+		this.benchBox = new item_BackgroundBox(300,830,200,200);
+		this.add(this.benchBox);
+		this.instructionStart = new item_Wall(0,0,1400,1000);
+		this.add(this.instructionStart);
+		this.add(new flixel_FlxSprite(0,0,"assets/images/Cows.png"));
+		this.pail1 = new item_Ingredient(400,600,"assets/images/milkPail.png");
+		this.pail2 = new item_Ingredient(650,600,"assets/images/milkPail.png");
+		this.pail1.set_width(60);
+		this.pail1.set_height(80);
+		this.pail1.offset.set_x(25);
+		this.pail1.offset.set_y(5);
+		this.pail2.set_width(60);
+		this.pail2.set_height(80);
+		this.pail2.offset.set_x(25);
+		this.pail2.offset.set_y(5);
+		this.add(this.pail1);
+		this.add(this.pail2);
+		this.milkLady = new character_NPC(50,800,"assets/images/girlSmall.png");
+		this.add(this.milkLady);
+		this.hero = new character_Hero(50,500);
+		this.add(this.hero);
+		this.textBox = new item_Ingredient(25,400,"assets/images/Text_Box.png");
+		this.instructions = new flixel_text_FlxText(50,425,1300," ",24);
+		this.returnDisplayBox = new item_Wall(0,0,1400,70);
+		this.returnDisplayBox.set_color(-8355712);
+		this.add(this.returnDisplayBox);
+		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
+		this.add(new flixel_FlxSprite(425,10,"assets/images/Carrot.png"));
+		this.add(new flixel_FlxSprite(540,10,"assets/images/Potato.png"));
+		this.add(new flixel_FlxSprite(655,10,"assets/images/milk.png"));
+		this.add(new flixel_FlxSprite(770,10,"assets/images/onion.png"));
+		this.add(new flixel_FlxSprite(885,10,"assets/images/souperSpice.png"));
+		this.add(new flixel_FlxSprite(1000,10,"assets/images/redFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1115,10,"assets/images/yellowFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1230,10,"assets/images/blueFlowerIcon.png"));
+		this.carrotNum = new flixel_text_FlxText(475,20,0," " + this.inventory.carrots,24,true);
+		this.potatoNum = new flixel_text_FlxText(590,20,0," " + this.inventory.potatoes,24,true);
+		this.milkNum = new flixel_text_FlxText(705,20,0," " + this.inventory.milk,24,true);
+		this.onionNum = new flixel_text_FlxText(820,20,0," " + this.inventory.onions,24,true);
+		this.souperSpiceNum = new flixel_text_FlxText(935,20,0," " + this.inventory.souperSpice,24,true);
+		this.redFlowerNum = new flixel_text_FlxText(1050,20,0," " + this.inventory.redFlower,24,true);
+		this.yellowFlowerNum = new flixel_text_FlxText(1165,20,0," " + this.inventory.yellowFlower,24,true);
+		this.blueFlowerNum = new flixel_text_FlxText(1280,20,0," " + this.inventory.blueFlower,24,true);
+		this.add(this.inventoryDisplayBox);
+		this.add(this.carrotNum);
+		this.add(this.potatoNum);
+		this.add(this.milkNum);
+		this.add(this.onionNum);
+		this.add(this.souperSpiceNum);
+		this.add(this.redFlowerNum);
+		this.add(this.yellowFlowerNum);
+		this.add(this.blueFlowerNum);
+	}
+	,backToMap: function() {
+		var nextState = new MapScene(this.inventory);
+		if(flixel_FlxG.game._state.switchTo(nextState)) {
+			flixel_FlxG.game._requestedState = nextState;
+		}
+	}
+	,AddMilk: function(obj1,obj2) {
+		obj1.kill();
+		this.milkCount += 2;
+		this.inventory.addMilk(2);
+		this.milkNum.set_text(" " + this.inventory.milk);
+	}
+	,FillBucket1: function(obj1,obj2) {
+		this.pailFillingBuffer1--;
+	}
+	,FillBucket2: function(obj1,obj2) {
+		this.pailFillingBuffer2--;
+	}
+	,DisplayInstructions: function(obj1,obj2) {
+		this.add(this.textBox);
+		this.add(this.instructions);
+		this.instructions.set_text("Hello, welcome to the Dariy! Push the buckets to the cows to milk them. When you're done, you can put the full buckets on the bench and I will bottle it up for you. Fair warning, some of our buckets may have holes, and you may need to come back later to find non-holey bukcets. Enter to exit");
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(13,_this.status)) {
+			this.textBox.kill();
+			this.instructions.kill();
+		}
+	}
+	,update: function(elapsed) {
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
+			var nextState = new MapScene(this.inventory);
+			if(flixel_FlxG.game._state.switchTo(nextState)) {
+				flixel_FlxG.game._requestedState = nextState;
+			}
+		}
+		flixel_FlxG.overlap(this.cows,this.pail1,$bind(this,this.FillBucket1));
+		flixel_FlxG.overlap(this.cows,this.pail2,$bind(this,this.FillBucket2));
+		flixel_FlxG.overlap(this.hero,this.pail1,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.hero,this.pail2,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.pail1,this.wallForPail,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.pail2,this.wallForPail,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.instructionStart,this.hero,$bind(this,this.DisplayInstructions));
+		if(this.pailFillingBuffer1 == 0 && this.emptyBucket1) {
+			this.pail1.loadGraphic("assets/images/fullMilkPail.png");
+			this.emptyBucket1 = false;
+			this.pail1.set_width(60);
+			this.pail1.set_height(80);
+			this.pail1.offset.set_x(25);
+			this.pail1.offset.set_y(5);
+		}
+		if(this.pailFillingBuffer2 == 0 && this.emptyBucket2) {
+			this.pail2.loadGraphic("assets/images/fullMilkPail.png");
+			this.emptyBucket2 = false;
+			this.pail2.set_width(60);
+			this.pail2.set_height(80);
+			this.pail2.offset.set_x(25);
+			this.pail2.offset.set_y(5);
+		}
+		if(this.emptyBucket1 == false) {
+			flixel_FlxG.overlap(this.pail1,this.benchBox,$bind(this,this.AddMilk));
+		}
+		if(this.emptyBucket2 == false) {
+			flixel_FlxG.overlap(this.pail2,this.benchBox,$bind(this,this.AddMilk));
+		}
+		flixel_FlxState.prototype.update.call(this,elapsed);
+	}
+	,__class__: MilkBarn
+});
+var PotatoField = function(incomingInventory) {
+	this.bush4 = "assets/images/Potato_Bush4.png";
+	this.bush3 = "assets/images/Potato_Bush3.png";
+	this.bush2 = "assets/images/Potato_Bush2.png";
+	this.bush1 = "assets/images/Potato_Bush1.png";
+	this.potatoIcon = "assets/images/Potato.png";
+	this.randomYLocation = 0;
+	this.randomXLocation = 0;
+	this.potatoCount = 0;
+	flixel_FlxState.call(this);
+	this.inventory = incomingInventory;
+};
+$hxClasses["PotatoField"] = PotatoField;
+PotatoField.__name__ = "PotatoField";
+PotatoField.__super__ = flixel_FlxState;
+PotatoField.prototype = $extend(flixel_FlxState.prototype,{
+	inventory: null
+	,carrotNum: null
+	,potatoNum: null
+	,milkNum: null
+	,onionNum: null
+	,souperSpiceNum: null
+	,redFlowerNum: null
+	,yellowFlowerNum: null
+	,blueFlowerNum: null
+	,inventoryDisplayBox: null
+	,returnDisplayBox: null
+	,hero: null
+	,potatoes: null
+	,bushes: null
+	,potatoCount: null
+	,walls: null
+	,randomXLocation: null
+	,randomYLocation: null
+	,instructionStart: null
+	,textBox: null
+	,instructions: null
+	,potatoMan: null
+	,potatoIcon: null
+	,bush1: null
+	,bush2: null
+	,bush3: null
+	,bush4: null
+	,create: function() {
+		flixel_FlxState.prototype.create.call(this);
+		this.walls = new flixel_group_FlxTypedGroup();
+		this.walls.add(new item_Wall(0,0,1400,100));
+		this.walls.add(new item_Wall(0,0,100,1000));
+		this.walls.add(new item_Wall(0,900,550,100));
+		this.walls.add(new item_Wall(1300,0,100,1000));
+		this.walls.add(new item_Wall(850,900,600,100));
+		this.walls.add(new item_Wall(0,999,1400,1));
+		this.add(this.walls);
+		this.instructionStart = new item_Wall(0,0,1400,1000);
+		this.add(this.instructionStart);
+		this.add(new flixel_FlxSprite(0,0,"assets/images/Potato_Field.png"));
+		this.potatoes = new flixel_group_FlxTypedGroup();
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.randomizeLocation();
+		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
+		this.add(this.potatoes);
+		this.potatoes.forEach(function(potato) {
+			potato.set_width(40);
+		});
+		this.potatoes.forEach(function(potato) {
+			potato.set_height(40);
+		});
+		this.potatoes.forEach(function(potato) {
+			potato.offset.set_x(5);
+		});
+		this.potatoes.forEach(function(potato) {
+			potato.offset.set_y(5);
+		});
+		this.bushes = new flixel_group_FlxTypedGroup();
+		this.bushes.add(new item_Bush(689,49,this.bush4));
+		this.bushes.add(new item_Bush(264,70,this.bush4));
+		this.bushes.add(new item_Bush(326,118,this.bush3));
+		this.bushes.add(new item_Bush(732,144,this.bush2));
+		this.bushes.add(new item_Bush(215,150,this.bush1));
+		this.bushes.add(new item_Bush(884,240,this.bush3));
+		this.bushes.add(new item_Bush(462,244,this.bush2));
+		this.bushes.add(new item_Bush(224,249,this.bush4));
+		this.bushes.add(new item_Bush(509,335,this.bush4));
+		this.bushes.add(new item_Bush(1134,361,this.bush3));
+		this.bushes.add(new item_Bush(1164,381,this.bush1));
+		this.bushes.add(new item_Bush(391,419,this.bush3));
+		this.bushes.add(new item_Bush(327,429,this.bush2));
+		this.bushes.add(new item_Bush(636,445,this.bush2));
+		this.bushes.add(new item_Bush(784,448,this.bush2));
+		this.bushes.add(new item_Bush(442,448,this.bush1));
+		this.bushes.add(new item_Bush(306,533,this.bush1));
+		this.bushes.add(new item_Bush(267,651,this.bush4));
+		this.bushes.add(new item_Bush(828,695,this.bush1));
+		this.bushes.add(new item_Bush(558,707,this.bush3));
+		this.bushes.add(new item_Bush(935,740,this.bush4));
+		this.bushes.add(new item_Bush(84,595,this.bush2));
+		this.bushes.add(new item_Bush(230,648,this.bush2));
+		this.add(this.bushes);
+		this.potatoMan = new character_NPC(600,800,"assets/images/PotatoSouth.png");
+		this.add(this.potatoMan);
+		this.hero = new character_Hero(650,850);
+		this.add(this.hero);
+		this.textBox = new item_Ingredient(25,400,"assets/images/Text_Box.png");
+		this.instructions = new flixel_text_FlxText(50,425,1300," ",24);
+		this.returnDisplayBox = new item_Wall(0,0,1400,70);
+		this.returnDisplayBox.set_color(-8355712);
+		this.add(this.returnDisplayBox);
+		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
+		this.add(new flixel_FlxSprite(425,10,"assets/images/Carrot.png"));
+		this.add(new flixel_FlxSprite(540,10,"assets/images/Potato.png"));
+		this.add(new flixel_FlxSprite(655,10,"assets/images/milk.png"));
+		this.add(new flixel_FlxSprite(770,10,"assets/images/onion.png"));
+		this.add(new flixel_FlxSprite(885,10,"assets/images/souperSpice.png"));
+		this.add(new flixel_FlxSprite(1000,10,"assets/images/redFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1115,10,"assets/images/yellowFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1230,10,"assets/images/blueFlowerIcon.png"));
+		this.carrotNum = new flixel_text_FlxText(475,20,0," " + this.inventory.carrots,24,true);
+		this.potatoNum = new flixel_text_FlxText(590,20,0," " + this.inventory.potatoes,24,true);
+		this.milkNum = new flixel_text_FlxText(705,20,0," " + this.inventory.milk,24,true);
+		this.onionNum = new flixel_text_FlxText(820,20,0," " + this.inventory.onions,24,true);
+		this.souperSpiceNum = new flixel_text_FlxText(935,20,0," " + this.inventory.souperSpice,24,true);
+		this.redFlowerNum = new flixel_text_FlxText(1050,20,0," " + this.inventory.redFlower,24,true);
+		this.yellowFlowerNum = new flixel_text_FlxText(1165,20,0," " + this.inventory.yellowFlower,24,true);
+		this.blueFlowerNum = new flixel_text_FlxText(1280,20,0," " + this.inventory.blueFlower,24,true);
+		this.add(this.inventoryDisplayBox);
+		this.add(this.carrotNum);
+		this.add(this.potatoNum);
+		this.add(this.milkNum);
+		this.add(this.onionNum);
+		this.add(this.souperSpiceNum);
+		this.add(this.redFlowerNum);
+		this.add(this.yellowFlowerNum);
+		this.add(this.blueFlowerNum);
+	}
+	,backToMap: function() {
+		var nextState = new MapScene(this.inventory);
+		if(flixel_FlxG.game._state.switchTo(nextState)) {
+			flixel_FlxG.game._requestedState = nextState;
+		}
+	}
+	,AddPotato: function(obj1,obj2) {
+		obj1.kill();
+		this.potatoCount++;
+		this.inventory.addPotatoes(1);
+		this.potatoNum.set_text(" " + this.inventory.potatoes);
+	}
+	,randomizeLocation: function() {
+		this.randomXLocation = flixel_FlxG.random.float(200,1200);
+		this.randomYLocation = flixel_FlxG.random.float(200,800);
+	}
+	,DisplayInstructions: function(obj1,obj2) {
+		this.add(this.textBox);
+		this.add(this.instructions);
+		this.instructions.set_text("Hello, welcome to the Potato Farm! If you find any potatoes in the bushes, you can use those for your soup! Enter to exit");
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(13,_this.status)) {
+			this.textBox.kill();
+			this.instructions.kill();
+		}
+	}
+	,update: function(elapsed) {
+		flixel_FlxG.overlap(this.potatoes,this.hero,$bind(this,this.AddPotato));
+		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
+		flixel_FlxG.overlap(this.instructionStart,this.hero,$bind(this,this.DisplayInstructions));
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
+			var nextState = new MapScene(this.inventory);
+			if(flixel_FlxG.game._state.switchTo(nextState)) {
+				flixel_FlxG.game._requestedState = nextState;
+			}
+		}
+		flixel_FlxState.prototype.update.call(this,elapsed);
+	}
+	,__class__: PotatoField
+});
 var Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
 Reflect.__name__ = "Reflect";
@@ -4960,14 +6007,14 @@ Reflect.makeVarArgs = function(f) {
 		return f(a2);
 	};
 };
-var Scene1 = function(incomingInventory) {
+var SoupScreen = function(incomingInventory) {
 	flixel_FlxState.call(this);
 	this.inventory = incomingInventory;
 };
-$hxClasses["Scene1"] = Scene1;
-Scene1.__name__ = "Scene1";
-Scene1.__super__ = flixel_FlxState;
-Scene1.prototype = $extend(flixel_FlxState.prototype,{
+$hxClasses["SoupScreen"] = SoupScreen;
+SoupScreen.__name__ = "SoupScreen";
+SoupScreen.__super__ = flixel_FlxState;
+SoupScreen.prototype = $extend(flixel_FlxState.prototype,{
 	inventory: null
 	,carrotNum: null
 	,potatoNum: null
@@ -4976,20 +6023,20 @@ Scene1.prototype = $extend(flixel_FlxState.prototype,{
 	,souperSpiceNum: null
 	,redFlowerNum: null
 	,yellowFlowerNum: null
+	,blueFlowerNum: null
 	,inventoryDisplayBox: null
 	,returnDisplayBox: null
 	,hero: null
 	,pot: null
 	,winScreenSprite: null
-	,backgroundSprite: null
 	,walls: null
 	,create: function() {
 		flixel_FlxState.prototype.create.call(this);
 		this.walls = new flixel_group_FlxTypedGroup();
-		this.walls.add(new item_Wall(0,0,1400,1));
+		this.walls.add(new item_Wall(0,0,1400,70));
 		this.walls.add(new item_Wall(0,0,1,1000));
-		this.walls.add(new item_Wall(0,900,1400,100));
-		this.walls.add(new item_Wall(1300,0,100,1000));
+		this.walls.add(new item_Wall(0,1000,1400,1));
+		this.walls.add(new item_Wall(1400,0,1,1000));
 		this.walls.add(new item_Wall(0,20,70,150));
 		this.walls.add(new item_Wall(820,900,200,100));
 		this.walls.add(new item_Wall(650,360,100,20));
@@ -4998,23 +6045,31 @@ Scene1.prototype = $extend(flixel_FlxState.prototype,{
 		this.add(this.walls);
 		this.winScreenSprite = new item_Wall(690,400,100,100);
 		this.add(this.winScreenSprite);
-		this.backgroundSprite = new flixel_FlxSprite(0,0,"assets/images/SoupLocation.png");
-		this.add(this.backgroundSprite);
+		this.add(new flixel_FlxSprite(0,0,"assets/images/SoupLocation.png"));
 		this.pot = new item_Ingredient(655,400,"assets/images/Pot.png");
 		this.add(this.pot);
-		this.add(new flixel_text_FlxText(100,270,1200,"Total needed: 18 Carrots, 17 Potatoes, 4 Bottles of Milk, 9 Onions, and 3 Parts Souper Spice",20));
-		this.add(new flixel_text_FlxText(400,200,0,"Go to Pot to Make Soup",38));
 		this.hero = new character_Hero(50,200);
 		this.add(this.hero);
-		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
-		this.inventoryDisplayBox.set_color(-8355712);
-		this.carrotNum = new flixel_text_FlxText(1100,20,0,"Carrots: " + this.inventory.carrots,24,true);
-		this.potatoNum = new flixel_text_FlxText(1100,50,0,"Potatoes: " + this.inventory.potatoes,24,true);
-		this.milkNum = new flixel_text_FlxText(1100,80,0,"Milk Bottle: " + this.inventory.milk,24,true);
-		this.onionNum = new flixel_text_FlxText(1100,110,0,"Onions: " + this.inventory.onions,24,true);
-		this.souperSpiceNum = new flixel_text_FlxText(1100,140,0,"Souper Spice: " + this.inventory.souperSpice,24,true);
-		this.redFlowerNum = new flixel_text_FlxText(1100,170,0,"Red Flowers: " + this.inventory.redFlower,24,true);
-		this.yellowFlowerNum = new flixel_text_FlxText(1100,200,0,"Yellow Flowers: " + this.inventory.yellowFlower,24,true);
+		this.returnDisplayBox = new item_Wall(0,0,1400,70);
+		this.returnDisplayBox.set_color(-8355712);
+		this.add(this.returnDisplayBox);
+		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
+		this.add(new flixel_FlxSprite(425,10,"assets/images/Carrot.png"));
+		this.add(new flixel_FlxSprite(540,10,"assets/images/Potato.png"));
+		this.add(new flixel_FlxSprite(655,10,"assets/images/milk.png"));
+		this.add(new flixel_FlxSprite(770,10,"assets/images/onion.png"));
+		this.add(new flixel_FlxSprite(885,10,"assets/images/souperSpice.png"));
+		this.add(new flixel_FlxSprite(1000,10,"assets/images/redFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1115,10,"assets/images/yellowFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1230,10,"assets/images/blueFlowerIcon.png"));
+		this.carrotNum = new flixel_text_FlxText(475,20,0," " + this.inventory.carrots,24,true);
+		this.potatoNum = new flixel_text_FlxText(590,20,0," " + this.inventory.potatoes,24,true);
+		this.milkNum = new flixel_text_FlxText(705,20,0," " + this.inventory.milk,24,true);
+		this.onionNum = new flixel_text_FlxText(820,20,0," " + this.inventory.onions,24,true);
+		this.souperSpiceNum = new flixel_text_FlxText(935,20,0," " + this.inventory.souperSpice,24,true);
+		this.redFlowerNum = new flixel_text_FlxText(1050,20,0," " + this.inventory.redFlower,24,true);
+		this.yellowFlowerNum = new flixel_text_FlxText(1165,20,0," " + this.inventory.yellowFlower,24,true);
+		this.blueFlowerNum = new flixel_text_FlxText(1280,20,0," " + this.inventory.blueFlower,24,true);
 		this.add(this.inventoryDisplayBox);
 		this.add(this.carrotNum);
 		this.add(this.potatoNum);
@@ -5023,10 +6078,7 @@ Scene1.prototype = $extend(flixel_FlxState.prototype,{
 		this.add(this.souperSpiceNum);
 		this.add(this.redFlowerNum);
 		this.add(this.yellowFlowerNum);
-		this.returnDisplayBox = new item_Wall(0,0,400,70);
-		this.returnDisplayBox.set_color(-8355712);
-		this.add(this.returnDisplayBox);
-		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
+		this.add(this.blueFlowerNum);
 	}
 	,backToMap: function() {
 		var nextState = new MapScene(this.inventory);
@@ -5035,7 +6087,7 @@ Scene1.prototype = $extend(flixel_FlxState.prototype,{
 		}
 	}
 	,goToWinScreen: function(obj1,obj2) {
-		var nextState = new Scene7(this.inventory);
+		var nextState = new WinScreens(this.inventory);
 		if(flixel_FlxG.game._state.switchTo(nextState)) {
 			flixel_FlxG.game._requestedState = nextState;
 		}
@@ -5052,841 +6104,30 @@ Scene1.prototype = $extend(flixel_FlxState.prototype,{
 		}
 		flixel_FlxState.prototype.update.call(this,elapsed);
 	}
-	,__class__: Scene1
+	,__class__: SoupScreen
 });
-var Scene2 = function(incomingInventory) {
-	this.carrotTopPicture = "assets/images/carrotTop.png";
-	this.glowingCarrotTopPicture = "assets/images/glowingCarrotTop.png";
-	this.carrotPicture = "assets/images/Carrot.png";
-	this.stageNum = 1;
-	this.carrotCount = 0;
-	flixel_FlxState.call(this);
-	this.inventory = incomingInventory;
+var StartScreen = function(MaxSize) {
+	flixel_FlxState.call(this,MaxSize);
 };
-$hxClasses["Scene2"] = Scene2;
-Scene2.__name__ = "Scene2";
-Scene2.__super__ = flixel_FlxState;
-Scene2.prototype = $extend(flixel_FlxState.prototype,{
-	inventory: null
-	,carrotNum: null
-	,potatoNum: null
-	,milkNum: null
-	,onionNum: null
-	,souperSpiceNum: null
-	,redFlowerNum: null
-	,yellowFlowerNum: null
-	,inventoryDisplayBox: null
-	,returnDisplayBox: null
-	,hero: null
-	,carrots: null
-	,glowcarrots: null
-	,carrotCount: null
-	,walls: null
-	,stageNum: null
-	,carrotPicture: null
-	,glowingCarrotTopPicture: null
-	,carrotTopPicture: null
-	,create: function() {
+$hxClasses["StartScreen"] = StartScreen;
+StartScreen.__name__ = "StartScreen";
+StartScreen.__super__ = flixel_FlxState;
+StartScreen.prototype = $extend(flixel_FlxState.prototype,{
+	create: function() {
 		flixel_FlxState.prototype.create.call(this);
-		this.walls = new flixel_group_FlxTypedGroup();
-		this.walls.add(new item_Wall(120,140,600,80));
-		this.walls.add(new item_Wall(0,0,130,200));
-		this.walls.add(new item_Wall(710,0,flixel_FlxG.width - 710,225));
-		this.walls.add(new item_Wall(1400,1000,1400,1));
-		this.walls.add(new item_Wall(970,250,500,200));
-		this.walls.add(new item_Wall(1350,750,50,150));
-		this.walls.add(new item_Wall(130,360,30,600));
-		this.walls.add(new item_Wall(120,flixel_FlxG.height - 100,200,60));
-		this.walls.add(new item_Wall(400,flixel_FlxG.height - 100,600,60));
-		this.walls.add(new item_Wall(960,flixel_FlxG.height - 150,30,110));
-		this.walls.add(new item_Wall(flixel_FlxG.width - 100,500,100,100));
-		this.walls.add(new item_Wall(0,flixel_FlxG.height - 450,100,350));
-		this.walls.add(new item_Wall(0,flixel_FlxG.height - 550,30,100));
-		this.add(this.walls);
-		this.add(new flixel_FlxSprite(0,0,"assets/images/carrotFarm.png"));
-		this.carrots = new flixel_group_FlxTypedGroup();
-		this.glowcarrots = new flixel_group_FlxTypedGroup();
-		this.carrots.add(new item_Ingredient(350,450,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,450,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(550,450,this.glowingCarrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(650,450,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(750,450,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(350,600,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,600,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(550,600,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(650,600,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(750,600,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(350,750,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,750,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(550,750,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(650,750,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(750,750,this.glowingCarrotTopPicture));
-		this.add(this.carrots);
-		this.add(this.glowcarrots);
-		this.hero = new character_Hero(50,250);
-		this.add(this.hero);
-		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
-		this.inventoryDisplayBox.set_color(-8355712);
-		this.carrotNum = new flixel_text_FlxText(1100,20,0,"Carrots: " + this.inventory.carrots,24,true);
-		this.potatoNum = new flixel_text_FlxText(1100,50,0,"Potatoes: " + this.inventory.potatoes,24,true);
-		this.milkNum = new flixel_text_FlxText(1100,80,0,"Milk Bottle: " + this.inventory.milk,24,true);
-		this.onionNum = new flixel_text_FlxText(1100,110,0,"Onions: " + this.inventory.onions,24,true);
-		this.souperSpiceNum = new flixel_text_FlxText(1100,140,0,"Souper Spice: " + this.inventory.souperSpice,24,true);
-		this.redFlowerNum = new flixel_text_FlxText(1100,170,0,"Red Flowers: " + this.inventory.redFlower,24,true);
-		this.yellowFlowerNum = new flixel_text_FlxText(1100,200,0,"Yellow Flowers: " + this.inventory.yellowFlower,24,true);
-		this.add(this.inventoryDisplayBox);
-		this.add(this.carrotNum);
-		this.add(this.potatoNum);
-		this.add(this.milkNum);
-		this.add(this.onionNum);
-		this.add(this.souperSpiceNum);
-		this.add(this.redFlowerNum);
-		this.add(this.yellowFlowerNum);
-		this.returnDisplayBox = new item_Wall(0,0,400,70);
-		this.returnDisplayBox.set_color(-8355712);
-		this.add(this.returnDisplayBox);
-		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
-	}
-	,CarrotStage1: function() {
-		this.carrots.add(new item_Ingredient(350,450,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,450,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(550,450,this.glowingCarrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(650,450,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(750,450,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(350,600,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,600,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(550,600,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(650,600,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(750,600,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(350,750,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,750,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(550,750,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(650,750,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(750,750,this.glowingCarrotTopPicture));
-		this.add(this.carrots);
-		this.add(this.glowcarrots);
-	}
-	,CarrotStage2: function() {
-		this.glowcarrots.add(new item_Ingredient(350,450,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,450,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(550,450,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(650,450,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(750,450,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(350,600,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,600,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(550,600,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(650,600,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(750,600,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(350,750,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(450,750,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(550,750,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(650,750,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(750,750,this.carrotTopPicture));
-		this.add(this.carrots);
-		this.add(this.glowcarrots);
-	}
-	,CarrotStage3: function() {
-		this.carrots.add(new item_Ingredient(350,450,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(450,450,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(550,450,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(650,450,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(750,450,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(350,600,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(450,600,this.glowingCarrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(550,600,this.glowingCarrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(650,600,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(750,600,this.carrotTopPicture));
-		this.glowcarrots.add(new item_Ingredient(350,750,this.glowingCarrotTopPicture));
-		this.carrots.add(new item_Ingredient(450,750,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(550,750,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(650,750,this.carrotTopPicture));
-		this.carrots.add(new item_Ingredient(750,750,this.carrotTopPicture));
-		this.add(this.carrots);
-		this.add(this.glowcarrots);
-	}
-	,backToMap: function() {
-		var nextState = new MapScene(this.inventory);
-		if(flixel_FlxG.game._state.switchTo(nextState)) {
-			flixel_FlxG.game._requestedState = nextState;
-		}
-	}
-	,ResetStage: function() {
-		this.carrots.forEach(function(carrot) {
-			carrot.kill();
-		});
-		this.glowcarrots.forEach(function(carrot) {
-			carrot.kill();
-		});
-	}
-	,AddCarrot: function(obj1,obj2) {
-		obj1.kill();
-		this.carrotCount++;
-		this.inventory.addCarrots(1);
-		this.carrotNum.set_text("Carrots: " + this.inventory.carrots);
-	}
-	,update: function(elapsed) {
-		flixel_FlxG.overlap(this.glowcarrots,this.hero,$bind(this,this.AddCarrot));
-		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
-		if(this.carrotCount == 0 && this.stageNum == 1) {
-			this.ResetStage();
-			this.CarrotStage1();
-			this.stageNum = 2;
-		} else if(this.carrotCount == 6 && this.stageNum == 2) {
-			this.ResetStage();
-			this.CarrotStage2();
-			this.stageNum = 3;
-		} else if(this.carrotCount == 12 && this.stageNum == 3) {
-			this.ResetStage();
-			this.CarrotStage3();
-		} else if(this.carrotCount == 18) {
-			this.ResetStage();
-		}
-		var _this = flixel_FlxG.keys.justPressed;
-		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
-			var nextState = new MapScene(this.inventory);
-			if(flixel_FlxG.game._state.switchTo(nextState)) {
-				flixel_FlxG.game._requestedState = nextState;
-			}
-		}
-		flixel_FlxState.prototype.update.call(this,elapsed);
-	}
-	,__class__: Scene2
-});
-var Scene3 = function(incomingInventory) {
-	this.bush4 = "assets/images/Potato_Bush4.png";
-	this.bush3 = "assets/images/Potato_Bush3.png";
-	this.bush2 = "assets/images/Potato_Bush2.png";
-	this.bush1 = "assets/images/Potato_Bush1.png";
-	this.potatoIcon = "assets/images/Potato.png";
-	this.randomYLocation = 0;
-	this.randomXLocation = 0;
-	this.potatoCount = 0;
-	flixel_FlxState.call(this);
-	this.inventory = incomingInventory;
-};
-$hxClasses["Scene3"] = Scene3;
-Scene3.__name__ = "Scene3";
-Scene3.__super__ = flixel_FlxState;
-Scene3.prototype = $extend(flixel_FlxState.prototype,{
-	inventory: null
-	,carrotNum: null
-	,potatoNum: null
-	,milkNum: null
-	,onionNum: null
-	,souperSpiceNum: null
-	,redFlowerNum: null
-	,yellowFlowerNum: null
-	,inventoryDisplayBox: null
-	,returnDisplayBox: null
-	,hero: null
-	,potatoes: null
-	,bushes: null
-	,potatoCount: null
-	,walls: null
-	,randomXLocation: null
-	,randomYLocation: null
-	,potatoIcon: null
-	,bush1: null
-	,bush2: null
-	,bush3: null
-	,bush4: null
-	,create: function() {
-		flixel_FlxState.prototype.create.call(this);
-		this.walls = new flixel_group_FlxTypedGroup();
-		this.walls.add(new item_Wall(0,0,1400,100));
-		this.walls.add(new item_Wall(0,0,100,1000));
-		this.walls.add(new item_Wall(0,900,1400,100));
-		this.walls.add(new item_Wall(1300,0,100,1000));
-		this.walls.add(new item_Wall(850,900,600,100));
-		this.add(this.walls);
-		this.add(new flixel_FlxSprite(0,0,"assets/images/Potato_Field.png"));
-		this.potatoes = new flixel_group_FlxTypedGroup();
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.randomizeLocation();
-		this.potatoes.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,this.potatoIcon));
-		this.add(this.potatoes);
-		this.bushes = new flixel_group_FlxTypedGroup();
-		this.bushes.add(new item_Bush(689,49,this.bush4));
-		this.bushes.add(new item_Bush(264,70,this.bush4));
-		this.bushes.add(new item_Bush(326,118,this.bush3));
-		this.bushes.add(new item_Bush(732,144,this.bush2));
-		this.bushes.add(new item_Bush(215,150,this.bush1));
-		this.bushes.add(new item_Bush(884,240,this.bush3));
-		this.bushes.add(new item_Bush(462,244,this.bush2));
-		this.bushes.add(new item_Bush(224,249,this.bush4));
-		this.bushes.add(new item_Bush(509,335,this.bush4));
-		this.bushes.add(new item_Bush(1134,361,this.bush3));
-		this.bushes.add(new item_Bush(1164,381,this.bush1));
-		this.bushes.add(new item_Bush(391,419,this.bush3));
-		this.bushes.add(new item_Bush(327,429,this.bush2));
-		this.bushes.add(new item_Bush(636,445,this.bush2));
-		this.bushes.add(new item_Bush(784,448,this.bush2));
-		this.bushes.add(new item_Bush(442,448,this.bush1));
-		this.bushes.add(new item_Bush(306,533,this.bush1));
-		this.bushes.add(new item_Bush(267,651,this.bush4));
-		this.bushes.add(new item_Bush(828,695,this.bush1));
-		this.bushes.add(new item_Bush(558,707,this.bush3));
-		this.bushes.add(new item_Bush(935,740,this.bush4));
-		this.bushes.add(new item_Bush(84,595,this.bush2));
-		this.bushes.add(new item_Bush(230,648,this.bush2));
-		this.add(this.bushes);
-		this.hero = new character_Hero(650,850);
-		this.add(this.hero);
-		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
-		this.inventoryDisplayBox.set_color(flixel_util_FlxColor.fromString("0xAA808080"));
-		this.carrotNum = new flixel_text_FlxText(1100,20,0,"Carrots: " + this.inventory.carrots,24,true);
-		this.potatoNum = new flixel_text_FlxText(1100,50,0,"Potatoes: " + this.inventory.potatoes,24,true);
-		this.milkNum = new flixel_text_FlxText(1100,80,0,"Milk Bottle: " + this.inventory.milk,24,true);
-		this.onionNum = new flixel_text_FlxText(1100,110,0,"Onions: " + this.inventory.onions,24,true);
-		this.souperSpiceNum = new flixel_text_FlxText(1100,140,0,"Souper Spice: " + this.inventory.souperSpice,24,true);
-		this.redFlowerNum = new flixel_text_FlxText(1100,170,0,"Red Flowers: " + this.inventory.redFlower,24,true);
-		this.yellowFlowerNum = new flixel_text_FlxText(1100,200,0,"Yellow Flowers: " + this.inventory.yellowFlower,24,true);
-		this.add(this.inventoryDisplayBox);
-		this.add(this.carrotNum);
-		this.add(this.potatoNum);
-		this.add(this.milkNum);
-		this.add(this.onionNum);
-		this.add(this.souperSpiceNum);
-		this.add(this.redFlowerNum);
-		this.add(this.yellowFlowerNum);
-		this.returnDisplayBox = new item_Wall(0,0,400,70);
-		this.returnDisplayBox.set_color(-8355712);
-		this.add(this.returnDisplayBox);
-		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
-	}
-	,backToMap: function() {
-		var nextState = new MapScene(this.inventory);
-		if(flixel_FlxG.game._state.switchTo(nextState)) {
-			flixel_FlxG.game._requestedState = nextState;
-		}
-	}
-	,AddPotato: function(obj1,obj2) {
-		obj1.kill();
-		this.potatoCount++;
-		this.inventory.addPotatoes(1);
-		this.potatoNum.set_text("Potatoes: " + this.inventory.potatoes);
-	}
-	,randomizeLocation: function() {
-		this.randomXLocation = flixel_FlxG.random.float(200,1200);
-		this.randomYLocation = flixel_FlxG.random.float(200,800);
-	}
-	,update: function(elapsed) {
-		flixel_FlxG.overlap(this.potatoes,this.hero,$bind(this,this.AddPotato));
-		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
-		var _this = flixel_FlxG.keys.justPressed;
-		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
-			var nextState = new MapScene(this.inventory);
-			if(flixel_FlxG.game._state.switchTo(nextState)) {
-				flixel_FlxG.game._requestedState = nextState;
-			}
-		}
-		flixel_FlxState.prototype.update.call(this,elapsed);
-	}
-	,__class__: Scene3
-});
-var Scene4 = function(incomingInventory) {
-	this.fullPail = "assets/images/fullMilkPail.png";
-	this.emptyPail = "assets/images/milkPail.png";
-	this.emptyBucket2 = true;
-	this.emptyBucket1 = true;
-	this.pailFillingBuffer2 = 200;
-	this.pailFillingBuffer1 = 200;
-	this.milkCount = 0;
-	flixel_FlxState.call(this);
-	this.inventory = incomingInventory;
-};
-$hxClasses["Scene4"] = Scene4;
-Scene4.__name__ = "Scene4";
-Scene4.__super__ = flixel_FlxState;
-Scene4.prototype = $extend(flixel_FlxState.prototype,{
-	inventory: null
-	,carrotNum: null
-	,potatoNum: null
-	,milkNum: null
-	,onionNum: null
-	,souperSpiceNum: null
-	,redFlowerNum: null
-	,yellowFlowerNum: null
-	,inventoryDisplayBox: null
-	,returnDisplayBox: null
-	,hero: null
-	,milkCount: null
-	,walls: null
-	,wallForPail: null
-	,cows: null
-	,pail1: null
-	,pail2: null
-	,pailFillingBuffer1: null
-	,pailFillingBuffer2: null
-	,emptyBucket1: null
-	,emptyBucket2: null
-	,benchBox: null
-	,emptyPail: null
-	,fullPail: null
-	,create: function() {
-		flixel_FlxState.prototype.create.call(this);
-		this.walls = new flixel_group_FlxTypedGroup();
-		this.walls.add(new item_Wall(0,0,1400,250));
-		this.walls.add(new item_Wall(0,0,10,1000));
-		this.walls.add(new item_Wall(0,990,1400,10));
-		this.walls.add(new item_Wall(1390,0,10,1000));
-		this.walls.add(new item_Wall(100,200,200,200));
-		this.add(this.walls);
-		this.wallForPail = new flixel_group_FlxTypedGroup();
-		this.wallForPail.add(new item_Wall(0,0,1400,400));
-		this.wallForPail.add(new item_Wall(0,0,110,1000));
-		this.wallForPail.add(new item_Wall(0,840,1400,160));
-		this.wallForPail.add(new item_Wall(1290,0,110,1000));
-		this.wallForPail.add(new item_Wall(100,200,350,350));
-		this.add(this.wallForPail);
-		this.cows = new flixel_group_FlxTypedGroup();
-		this.cows.add(new item_BackgroundBox(525,275,250,150));
-		this.cows.add(new item_BackgroundBox(1000,325,250,150));
-		this.cows.add(new item_BackgroundBox(1200,650,100,300));
-		this.add(this.cows);
-		this.benchBox = new item_BackgroundBox(300,830,200,200);
-		this.add(this.benchBox);
-		this.add(new flixel_FlxSprite(0,0,"assets/images/Cows.png"));
-		this.pail1 = new item_Ingredient(400,600,"assets/images/milkPail.png");
-		this.pail2 = new item_Ingredient(650,600,"assets/images/milkPail.png");
-		this.add(this.pail1);
-		this.add(this.pail2);
-		this.hero = new character_Hero(50,500);
-		this.add(this.hero);
-		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
-		this.inventoryDisplayBox.set_color(-8355712);
-		this.carrotNum = new flixel_text_FlxText(1100,20,0,"Carrots: " + this.inventory.carrots,24,true);
-		this.potatoNum = new flixel_text_FlxText(1100,50,0,"Potatoes: " + this.inventory.potatoes,24,true);
-		this.milkNum = new flixel_text_FlxText(1100,80,0,"Milk Bottles: " + this.inventory.milk,24,true);
-		this.onionNum = new flixel_text_FlxText(1100,110,0,"Onions: " + this.inventory.onions,24,true);
-		this.souperSpiceNum = new flixel_text_FlxText(1100,140,0,"Souper Spice: " + this.inventory.souperSpice,24,true);
-		this.redFlowerNum = new flixel_text_FlxText(1100,170,0,"Red Flowers: " + this.inventory.redFlower,24,true);
-		this.yellowFlowerNum = new flixel_text_FlxText(1100,200,0,"Yellow Flowers: " + this.inventory.yellowFlower,24,true);
-		this.add(this.inventoryDisplayBox);
-		this.add(this.carrotNum);
-		this.add(this.potatoNum);
-		this.add(this.milkNum);
-		this.add(this.onionNum);
-		this.add(this.souperSpiceNum);
-		this.add(this.redFlowerNum);
-		this.add(this.yellowFlowerNum);
-		this.returnDisplayBox = new item_Wall(0,0,400,70);
-		this.returnDisplayBox.set_color(-8355712);
-		this.add(this.returnDisplayBox);
-		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
-	}
-	,backToMap: function() {
-		var nextState = new MapScene(this.inventory);
-		if(flixel_FlxG.game._state.switchTo(nextState)) {
-			flixel_FlxG.game._requestedState = nextState;
-		}
-	}
-	,AddMilk: function(obj1,obj2) {
-		obj1.kill();
-		this.milkCount += 2;
-		this.inventory.addMilk(2);
-		this.milkNum.set_text("Milk Bottles: " + this.inventory.milk);
-	}
-	,FillBucket1: function(obj1,obj2) {
-		this.pailFillingBuffer1--;
-	}
-	,FillBucket2: function(obj1,obj2) {
-		this.pailFillingBuffer2--;
+		this.add(new flixel_FlxSprite(0,0,"assets/images/Start_Screenenter.png"));
 	}
 	,update: function(elapsed) {
 		var _this = flixel_FlxG.keys.justPressed;
-		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
-			var nextState = new MapScene(this.inventory);
-			if(flixel_FlxG.game._state.switchTo(nextState)) {
-				flixel_FlxG.game._requestedState = nextState;
-			}
-		}
-		flixel_FlxG.overlap(this.cows,this.pail1,$bind(this,this.FillBucket1));
-		flixel_FlxG.overlap(this.cows,this.pail2,$bind(this,this.FillBucket2));
-		flixel_FlxG.overlap(this.hero,this.pail1,null,flixel_FlxObject.separate);
-		flixel_FlxG.overlap(this.hero,this.pail2,null,flixel_FlxObject.separate);
-		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
-		flixel_FlxG.overlap(this.pail1,this.wallForPail,null,flixel_FlxObject.separate);
-		flixel_FlxG.overlap(this.pail2,this.wallForPail,null,flixel_FlxObject.separate);
-		if(this.pailFillingBuffer1 == 0 && this.emptyBucket1) {
-			this.pail1.loadGraphic("assets/images/fullMilkPail.png");
-			this.emptyBucket1 = false;
-		}
-		if(this.pailFillingBuffer2 == 0 && this.emptyBucket2) {
-			this.pail2.loadGraphic("assets/images/fullMilkPail.png");
-			this.emptyBucket2 = false;
-		}
-		if(this.emptyBucket1 == false) {
-			flixel_FlxG.overlap(this.pail1,this.benchBox,$bind(this,this.AddMilk));
-		}
-		if(this.emptyBucket2 == false) {
-			flixel_FlxG.overlap(this.pail2,this.benchBox,$bind(this,this.AddMilk));
-		}
-		flixel_FlxState.prototype.update.call(this,elapsed);
-	}
-	,__class__: Scene4
-});
-var Scene5 = function(incomingInventory) {
-	flixel_FlxState.call(this);
-	this.inventory = incomingInventory;
-};
-$hxClasses["Scene5"] = Scene5;
-Scene5.__name__ = "Scene5";
-Scene5.__super__ = flixel_FlxState;
-Scene5.prototype = $extend(flixel_FlxState.prototype,{
-	inventory: null
-	,carrotNum: null
-	,potatoNum: null
-	,milkNum: null
-	,onionNum: null
-	,souperSpiceNum: null
-	,redFlowerNum: null
-	,yellowFlowerNum: null
-	,returnDisplayBox: null
-	,inventoryDisplayBox: null
-	,hero: null
-	,onionGal: null
-	,checkoutCounterBox: null
-	,talkBox: null
-	,yellowFlowerTrade: null
-	,redFlowerTrade: null
-	,walls: null
-	,beginConversationText: null
-	,dia1: null
-	,dia2: null
-	,endConversation: null
-	,notEnoughRedFlowers: null
-	,notEnoughYellowFlowers: null
-	,create: function() {
-		flixel_FlxState.prototype.create.call(this);
-		this.walls = new flixel_group_FlxTypedGroup();
-		this.walls.add(new item_Wall(0,0,1400,1));
-		this.walls.add(new item_Wall(0,0,1,1000));
-		this.walls.add(new item_Wall(0,900,1400,100));
-		this.walls.add(new item_Wall(1300,0,100,1000));
-		this.add(this.walls);
-		this.checkoutCounterBox = new item_Wall(600,0,500,400);
-		this.add(this.checkoutCounterBox);
-		this.talkBox = new item_Wall(550,200,50,100);
-		this.talkBox.set_color(-8355712);
-		this.add(this.talkBox);
-		this.onionGal = new character_NPC(700,200,"assets/images/OnionGirl.png");
-		this.add(this.onionGal);
-		this.yellowFlowerTrade = new item_Ingredient(900,600,"assets/images/yellowFlower.png");
-		this.add(this.yellowFlowerTrade);
-		this.redFlowerTrade = new item_Ingredient(900,500,"assets/images/redFlower.png");
-		this.add(this.redFlowerTrade);
-		this.hero = new character_Hero(50,50);
-		this.add(this.hero);
-		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
-		this.inventoryDisplayBox.set_color(-8355712);
-		this.carrotNum = new flixel_text_FlxText(1100,20,0,"Carrots: " + this.inventory.carrots,24,true);
-		this.potatoNum = new flixel_text_FlxText(1100,50,0,"Potatoes: " + this.inventory.potatoes,24,true);
-		this.milkNum = new flixel_text_FlxText(1100,80,0,"Milk Bottle: " + this.inventory.milk,24,true);
-		this.onionNum = new flixel_text_FlxText(1100,110,0,"Onions: " + this.inventory.onions,24,true);
-		this.souperSpiceNum = new flixel_text_FlxText(1100,140,0,"Souper Spice: " + this.inventory.souperSpice,24,true);
-		this.redFlowerNum = new flixel_text_FlxText(1100,170,0,"Red Flowers: " + this.inventory.redFlower,24,true);
-		this.yellowFlowerNum = new flixel_text_FlxText(1100,200,0,"Yellow Flowers: " + this.inventory.yellowFlower,24,true);
-		this.add(this.inventoryDisplayBox);
-		this.add(this.carrotNum);
-		this.add(this.potatoNum);
-		this.add(this.milkNum);
-		this.add(this.onionNum);
-		this.add(this.souperSpiceNum);
-		this.add(this.redFlowerNum);
-		this.add(this.yellowFlowerNum);
-		this.returnDisplayBox = new item_Wall(0,0,400,70);
-		this.returnDisplayBox.set_color(-8355712);
-		this.add(this.returnDisplayBox);
-		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
-		this.notEnoughRedFlowers = new flixel_text_FlxText(50,700,0,"",24);
-		this.add(this.notEnoughRedFlowers);
-		this.notEnoughYellowFlowers = new flixel_text_FlxText(50,750,0,"",24);
-		this.add(this.notEnoughYellowFlowers);
-		this.beginConversationText = new flixel_text_FlxText(50,800,0,"",24);
-		this.add(this.beginConversationText);
-		this.dia1 = new flixel_text_FlxText(50,850,0,"",24);
-		this.add(this.dia1);
-		this.dia2 = new flixel_text_FlxText(50,900,0,"",24);
-		this.add(this.dia2);
-		this.endConversation = new flixel_text_FlxText(50,950,0,"",24);
-		this.add(this.endConversation);
-	}
-	,backToMap: function() {
-		var nextState = new MapScene(this.inventory);
-		if(flixel_FlxG.game._state.switchTo(nextState)) {
-			flixel_FlxG.game._requestedState = nextState;
-		}
-	}
-	,BeginDialogue: function(obj1,obj2) {
-		this.beginConversationText.set_text("Hello! Welcome to the General Store!");
-		this.dia1.set_text("To trade 27 Red Flowers for 9 Onions, go to the Red Flower");
-		this.dia2.set_text("To Trade 81 Yellow Flowers for 3 Souper Spice, go to the Yellow Flower.");
-		this.endConversation.set_text("Thanks for your business!");
-	}
-	,RedFlowerForOnion: function(obj1,obj2) {
-		if(this.inventory.redFlower >= 27) {
-			this.inventory.consumeRedFlowers(27);
-			this.inventory.addOnions(9);
-			this.onionNum.set_text("Onions: " + this.inventory.onions);
-			this.redFlowerNum.set_text("Red Flowers: " + this.inventory.redFlower);
-		} else {
-			this.notEnoughRedFlowers.set_text("Sorry, you don't have enough Red Flowers Yet");
-		}
-	}
-	,YellowFlowerForSouperSpice: function(obj1,obj2) {
-		if(this.inventory.yellowFlower >= 81) {
-			this.inventory.consumeYellowFlowers(81);
-			this.inventory.addSouperSpice(3);
-			this.souperSpiceNum.set_text("Souper Spice: " + this.inventory.souperSpice);
-			this.yellowFlowerNum.set_text("Yellow Flowers: " + this.inventory.yellowFlower);
-		} else {
-			this.notEnoughYellowFlowers.set_text("Sorry, you don't have enough Yellow Flowers Yet");
-		}
-	}
-	,update: function(elapsed) {
-		flixel_FlxG.overlap(this.talkBox,this.hero,$bind(this,this.BeginDialogue));
-		flixel_FlxG.overlap(this.hero,this.checkoutCounterBox,null,flixel_FlxObject.separate);
-		flixel_FlxG.overlap(this.redFlowerTrade,this.hero,$bind(this,this.RedFlowerForOnion));
-		flixel_FlxG.overlap(this.yellowFlowerTrade,this.hero,$bind(this,this.YellowFlowerForSouperSpice));
-		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
-		var _this = flixel_FlxG.keys.justReleased;
-		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
-			var nextState = new MapScene(this.inventory);
+		if(_this.keyManager.checkStatusUnsafe(13,_this.status)) {
+			var nextState = new MapScene();
 			if(flixel_FlxG.game._state.switchTo(nextState)) {
 				flixel_FlxG.game._requestedState = nextState;
 			}
 		}
 		flixel_FlxState.prototype.update.call(this,elapsed);
 	}
-	,__class__: Scene5
-});
-var FlowerInstructionField = function(incomingInventory) {
-	this.randomYLocation = 0;
-	this.randomXLocation = 0;
-	flixel_FlxState.call(this);
-	this.inventory = incomingInventory;
-};
-$hxClasses["FlowerInstructionField"] = FlowerInstructionField;
-FlowerInstructionField.__name__ = "FlowerInstructionField";
-FlowerInstructionField.__super__ = flixel_FlxState;
-FlowerInstructionField.prototype = $extend(flixel_FlxState.prototype,{
-	inventory: null
-	,carrotNum: null
-	,potatoNum: null
-	,milkNum: null
-	,onionNum: null
-	,souperSpiceNum: null
-	,redFlowerNum: null
-	,yellowFlowerNum: null
-	,inventoryDisplayBox: null
-	,returnDisplayBox: null
-	,walls: null
-	,hero: null
-	,redFlowers: null
-	,yellowFlowers: null
-	,randomXLocation: null
-	,randomYLocation: null
-	,create: function() {
-		flixel_FlxState.prototype.create.call(this);
-		this.walls = new flixel_group_FlxTypedGroup();
-		this.walls.add(new item_Wall(0,0,1400,1));
-		this.walls.add(new item_Wall(0,0,1,1000));
-		this.walls.add(new item_Wall(0,900,1400,100));
-		this.walls.add(new item_Wall(1300,0,100,1000));
-		this.add(this.walls);
-		this.redFlowers = new flixel_group_FlxTypedGroup();
-		var _g = 0;
-		while(_g < 35) {
-			var i = _g++;
-			this.randomizeLocation();
-			this.redFlowers.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,"assets/images/redFlower.png"));
-		}
-		this.add(this.redFlowers);
-		this.yellowFlowers = new flixel_group_FlxTypedGroup();
-		var _g = 0;
-		while(_g < 100) {
-			var i = _g++;
-			this.randomizeLocation();
-			this.yellowFlowers.add(new item_Ingredient(this.randomXLocation,this.randomYLocation,"assets/images/yellowFlower.png"));
-		}
-		this.add(this.yellowFlowers);
-		this.hero = new character_Hero(50,50);
-		this.add(this.hero);
-		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
-		this.inventoryDisplayBox.set_color(-8355712);
-		this.carrotNum = new flixel_text_FlxText(1100,20,0,"Carrots: " + this.inventory.carrots,24,true);
-		this.potatoNum = new flixel_text_FlxText(1100,50,0,"Potatoes: " + this.inventory.potatoes,24,true);
-		this.milkNum = new flixel_text_FlxText(1100,80,0,"Milk Bottle: " + this.inventory.milk,24,true);
-		this.onionNum = new flixel_text_FlxText(1100,110,0,"Onions: " + this.inventory.onions,24,true);
-		this.souperSpiceNum = new flixel_text_FlxText(1100,140,0,"Souper Spice: " + this.inventory.souperSpice,24,true);
-		this.redFlowerNum = new flixel_text_FlxText(1100,170,0,"Red Flowers: " + this.inventory.redFlower,24,true);
-		this.yellowFlowerNum = new flixel_text_FlxText(1100,200,0,"Yellow Flowers: " + this.inventory.yellowFlower,24,true);
-		this.add(this.inventoryDisplayBox);
-		this.add(this.carrotNum);
-		this.add(this.potatoNum);
-		this.add(this.milkNum);
-		this.add(this.onionNum);
-		this.add(this.souperSpiceNum);
-		this.add(this.redFlowerNum);
-		this.add(this.yellowFlowerNum);
-		this.returnDisplayBox = new item_Wall(0,0,400,70);
-		this.returnDisplayBox.set_color(-8355712);
-		this.add(this.returnDisplayBox);
-		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
-	}
-	,backToMap: function() {
-		var nextState = new MapScene(this.inventory);
-		if(flixel_FlxG.game._state.switchTo(nextState)) {
-			flixel_FlxG.game._requestedState = nextState;
-		}
-	}
-	,randomizeLocation: function() {
-		this.randomXLocation = flixel_FlxG.random.float(100,1300);
-		this.randomYLocation = flixel_FlxG.random.float(100,900);
-	}
-	,AddRedFlower: function(obj1,obj2) {
-		obj1.kill();
-		this.inventory.addRedFlowers(1);
-		this.redFlowerNum.set_text("Red Flowers: " + this.inventory.redFlower);
-	}
-	,AddYellowFlower: function(obj1,obj2) {
-		obj1.kill();
-		this.inventory.addYellowFlowers(1);
-		this.yellowFlowerNum.set_text("Yellow Flowers: " + this.inventory.yellowFlower);
-	}
-	,update: function(elapsed) {
-		flixel_FlxG.overlap(this.redFlowers,this.hero,$bind(this,this.AddRedFlower));
-		flixel_FlxG.overlap(this.yellowFlowers,this.hero,$bind(this,this.AddYellowFlower));
-		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
-		var _this = flixel_FlxG.keys.justPressed;
-		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
-			var nextState = new MapScene(this.inventory);
-			if(flixel_FlxG.game._state.switchTo(nextState)) {
-				flixel_FlxG.game._requestedState = nextState;
-			}
-		}
-		flixel_FlxState.prototype.update.call(this,elapsed);
-	}
-	,__class__: FlowerInstructionField
-});
-var Scene7 = function(incomingInventory) {
-	this.totalPts = 0;
-	flixel_FlxState.call(this);
-	this.inventory = incomingInventory;
-};
-$hxClasses["Scene7"] = Scene7;
-Scene7.__name__ = "Scene7";
-Scene7.__super__ = flixel_FlxState;
-Scene7.prototype = $extend(flixel_FlxState.prototype,{
-	inventory: null
-	,carrotNum: null
-	,potatoNum: null
-	,milkNum: null
-	,onionNum: null
-	,souperSpiceNum: null
-	,redFlowerNum: null
-	,yellowFlowerNum: null
-	,inventoryDisplayBox: null
-	,returnDisplayBox: null
-	,totalPts: null
-	,create: function() {
-		flixel_FlxState.prototype.create.call(this);
-		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
-		this.inventoryDisplayBox.set_color(-8355712);
-		this.carrotNum = new flixel_text_FlxText(1100,20,0,"Carrots: " + this.inventory.carrots,24,true);
-		this.potatoNum = new flixel_text_FlxText(1100,50,0,"Potatoes: " + this.inventory.potatoes,24,true);
-		this.milkNum = new flixel_text_FlxText(1100,80,0,"Milk Bottle: " + this.inventory.milk,24,true);
-		this.onionNum = new flixel_text_FlxText(1100,110,0,"Onions: " + this.inventory.onions,24,true);
-		this.souperSpiceNum = new flixel_text_FlxText(1100,140,0,"Souper Spice: " + this.inventory.souperSpice,24,true);
-		this.redFlowerNum = new flixel_text_FlxText(1100,170,0,"Red Flowers: " + this.inventory.redFlower,24,true);
-		this.yellowFlowerNum = new flixel_text_FlxText(1100,200,0,"Yellow Flowers: " + this.inventory.yellowFlower,24,true);
-		this.add(this.inventoryDisplayBox);
-		this.add(this.carrotNum);
-		this.add(this.potatoNum);
-		this.add(this.milkNum);
-		this.add(this.onionNum);
-		this.add(this.souperSpiceNum);
-		this.add(this.redFlowerNum);
-		this.add(this.yellowFlowerNum);
-		if(this.inventory.carrots >= 18) {
-			this.totalPts += 1;
-		}
-		if(this.inventory.potatoes >= 17) {
-			this.totalPts += 1;
-		}
-		if(this.inventory.milk >= 4) {
-			this.totalPts += 1;
-		}
-		if(this.inventory.onions >= 9) {
-			this.totalPts += 1;
-		}
-		if(this.inventory.souperSpice >= 3) {
-			this.totalPts += 1;
-		}
-		if(this.totalPts == 5) {
-			this.add(new flixel_text_FlxText(200,200,0,"COMPLETED 100%!",32));
-			this.add(new flixel_text_FlxText(200,300,0,"You are a Souper Chef!",32));
-		} else if(this.totalPts > 0 && this.totalPts < 5) {
-			this.add(new flixel_text_FlxText(200,200,0,"The Legendary Soup is somewhat complete...",32));
-			this.add(new flixel_text_FlxText(200,300,0,"You are a somewhat decent chef, we suppose...",32));
-		} else if(this.totalPts == 0) {
-			this.add(new flixel_text_FlxText(200,200,0,"You have made Air Soup",32));
-			this.add(new flixel_text_FlxText(200,300,0,"You call yourself a chef?!?!",32));
-		}
-		this.returnDisplayBox = new item_Wall(0,0,400,70);
-		this.returnDisplayBox.set_color(-8355712);
-		this.add(this.returnDisplayBox);
-		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
-	}
-	,backToMap: function() {
-		var nextState = new MapScene(this.inventory);
-		if(flixel_FlxG.game._state.switchTo(nextState)) {
-			flixel_FlxG.game._requestedState = nextState;
-		}
-	}
-	,update: function(elapsed) {
-		var _this = flixel_FlxG.keys.justPressed;
-		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
-			var nextState = new MapScene(this.inventory);
-			if(flixel_FlxG.game._state.switchTo(nextState)) {
-				flixel_FlxG.game._requestedState = nextState;
-			}
-		}
-		flixel_FlxState.prototype.update.call(this,elapsed);
-	}
-	,__class__: Scene7
+	,__class__: StartScreen
 });
 var Std = function() { };
 $hxClasses["Std"] = Std;
@@ -6296,6 +6537,102 @@ UnicodeString.get_length = function(this1) {
 	}
 	return l;
 };
+var WinScreens = function(incomingInventory) {
+	this.totalPts = 0;
+	flixel_FlxState.call(this);
+	this.inventory = incomingInventory;
+};
+$hxClasses["WinScreens"] = WinScreens;
+WinScreens.__name__ = "WinScreens";
+WinScreens.__super__ = flixel_FlxState;
+WinScreens.prototype = $extend(flixel_FlxState.prototype,{
+	inventory: null
+	,carrotNum: null
+	,potatoNum: null
+	,milkNum: null
+	,onionNum: null
+	,souperSpiceNum: null
+	,redFlowerNum: null
+	,yellowFlowerNum: null
+	,blueFlowerNum: null
+	,inventoryDisplayBox: null
+	,returnDisplayBox: null
+	,totalPts: null
+	,create: function() {
+		flixel_FlxState.prototype.create.call(this);
+		this.returnDisplayBox = new item_Wall(0,0,1400,70);
+		this.returnDisplayBox.set_color(-8355712);
+		this.add(this.returnDisplayBox);
+		this.add(new flixel_text_FlxText(20,20,0,"Use 'R' to return to Map.",24));
+		this.add(new flixel_FlxSprite(425,10,"assets/images/Carrot.png"));
+		this.add(new flixel_FlxSprite(540,10,"assets/images/Potato.png"));
+		this.add(new flixel_FlxSprite(655,10,"assets/images/milk.png"));
+		this.add(new flixel_FlxSprite(770,10,"assets/images/onion.png"));
+		this.add(new flixel_FlxSprite(885,10,"assets/images/souperSpice.png"));
+		this.add(new flixel_FlxSprite(1000,10,"assets/images/redFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1115,10,"assets/images/yellowFlowerIcon.png"));
+		this.add(new flixel_FlxSprite(1230,10,"assets/images/blueFlowerIcon.png"));
+		this.carrotNum = new flixel_text_FlxText(475,20,0," " + this.inventory.carrots,24,true);
+		this.potatoNum = new flixel_text_FlxText(590,20,0," " + this.inventory.potatoes,24,true);
+		this.milkNum = new flixel_text_FlxText(705,20,0," " + this.inventory.milk,24,true);
+		this.onionNum = new flixel_text_FlxText(820,20,0," " + this.inventory.onions,24,true);
+		this.souperSpiceNum = new flixel_text_FlxText(935,20,0," " + this.inventory.souperSpice,24,true);
+		this.redFlowerNum = new flixel_text_FlxText(1050,20,0," " + this.inventory.redFlower,24,true);
+		this.yellowFlowerNum = new flixel_text_FlxText(1165,20,0," " + this.inventory.yellowFlower,24,true);
+		this.blueFlowerNum = new flixel_text_FlxText(1280,20,0," " + this.inventory.blueFlower,24,true);
+		this.add(this.inventoryDisplayBox);
+		this.add(this.carrotNum);
+		this.add(this.potatoNum);
+		this.add(this.milkNum);
+		this.add(this.onionNum);
+		this.add(this.souperSpiceNum);
+		this.add(this.redFlowerNum);
+		this.add(this.yellowFlowerNum);
+		this.add(this.blueFlowerNum);
+		if(this.inventory.carrots >= 18) {
+			this.totalPts += 1;
+		}
+		if(this.inventory.potatoes >= 17) {
+			this.totalPts += 1;
+		}
+		if(this.inventory.milk >= 4) {
+			this.totalPts += 1;
+		}
+		if(this.inventory.onions >= 9) {
+			this.totalPts += 1;
+		}
+		if(this.inventory.souperSpice >= 3) {
+			this.totalPts += 1;
+		}
+		if(this.totalPts == 5) {
+			this.add(new flixel_text_FlxText(200,200,0,"COMPLETED 100%!",32));
+			this.add(new flixel_text_FlxText(200,300,0,"You are a Souper Chef!",32));
+		} else if(this.totalPts > 0 && this.totalPts < 5) {
+			this.add(new flixel_text_FlxText(200,200,0,"The Legendary Soup is somewhat complete...",32));
+			this.add(new flixel_text_FlxText(200,300,0,"You are a somewhat decent chef, we suppose...",32));
+		} else if(this.totalPts == 0) {
+			this.add(new flixel_text_FlxText(200,200,0,"You have made Air Soup",32));
+			this.add(new flixel_text_FlxText(200,300,0,"You call yourself a chef?!?!",32));
+		}
+	}
+	,backToMap: function() {
+		var nextState = new MapScene(this.inventory);
+		if(flixel_FlxG.game._state.switchTo(nextState)) {
+			flixel_FlxG.game._requestedState = nextState;
+		}
+	}
+	,update: function(elapsed) {
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(82,_this.status)) {
+			var nextState = new MapScene(this.inventory);
+			if(flixel_FlxG.game._state.switchTo(nextState)) {
+				flixel_FlxG.game._requestedState = nextState;
+			}
+		}
+		flixel_FlxState.prototype.update.call(this,elapsed);
+	}
+	,__class__: WinScreens
+});
 var XmlType = {};
 XmlType.toString = function(this1) {
 	switch(this1) {
@@ -9180,10 +9517,7 @@ flixel_FlxSprite.prototype = $extend(flixel_FlxObject.prototype,{
 	,__class__: flixel_FlxSprite
 	,__properties__: $extend(flixel_FlxObject.prototype.__properties__,{set_clipRect:"set_clipRect",set_color:"set_color",set_blend:"set_blend",set_flipY:"set_flipY",set_flipX:"set_flipX",set_facing:"set_facing",set_alpha:"set_alpha",set_graphic:"set_graphic",set_frames:"set_frames",set_frame:"set_frame",set_pixels:"set_pixels",get_pixels:"get_pixels",set_antialiasing:"set_antialiasing",set_useFramePixels:"set_useFramePixels"})
 });
-var character_Hero = function(x,y,characterGraphic) {
-	if(characterGraphic == null) {
-		characterGraphic = "assets/images/heroSouth.png";
-	}
+var character_Hero = function(x,y) {
 	if(y == null) {
 		y = 0;
 	}
@@ -9192,7 +9526,11 @@ var character_Hero = function(x,y,characterGraphic) {
 	}
 	this.SPEED = 200;
 	flixel_FlxSprite.call(this,x,y);
-	this.loadGraphic(characterGraphic,false,40,67);
+	this.loadGraphic("assets/images/heroSouth.png");
+	this.set_width(45);
+	this.set_height(90);
+	this.offset.set_x(20);
+	this.offset.set_y(30);
 };
 $hxClasses["character.Hero"] = character_Hero;
 character_Hero.__name__ = "character.Hero";
@@ -9205,24 +9543,40 @@ character_Hero.prototype = $extend(flixel_FlxSprite.prototype,{
 			this.velocity.set_x(-this.SPEED);
 			this.velocity.set_y(0);
 			this.loadGraphic("assets/images/heroWest.png",false,40,67);
+			this.set_width(30);
+			this.set_height(90);
+			this.offset.set_x(30);
+			this.offset.set_y(30);
 		}
 		var _this = flixel_FlxG.keys.pressed;
 		if(_this.keyManager.checkStatusUnsafe(39,_this.status)) {
 			this.velocity.set_x(this.SPEED);
 			this.velocity.set_y(0);
 			this.loadGraphic("assets/images/heroEast.png",false,40,67);
+			this.set_width(30);
+			this.set_height(90);
+			this.offset.set_x(20);
+			this.offset.set_y(30);
 		}
 		var _this = flixel_FlxG.keys.pressed;
 		if(_this.keyManager.checkStatusUnsafe(38,_this.status)) {
 			this.velocity.set_y(-this.SPEED);
 			this.velocity.set_x(0);
 			this.loadGraphic("assets/images/heroNorth.png",false,40,67);
+			this.set_width(45);
+			this.set_height(90);
+			this.offset.set_x(20);
+			this.offset.set_y(30);
 		}
 		var _this = flixel_FlxG.keys.pressed;
 		if(_this.keyManager.checkStatusUnsafe(40,_this.status)) {
 			this.velocity.set_y(this.SPEED);
 			this.velocity.set_x(0);
 			this.loadGraphic("assets/images/heroSouth.png",false,40,67);
+			this.set_width(45);
+			this.set_height(90);
+			this.offset.set_x(20);
+			this.offset.set_y(30);
 		}
 		var tmp;
 		var tmp1;
@@ -9262,6 +9616,7 @@ var character_Inventory = function() {
 	this.souperSpice = 0;
 	this.redFlower = 0;
 	this.yellowFlower = 0;
+	this.blueFlower = 0;
 };
 $hxClasses["character.Inventory"] = character_Inventory;
 character_Inventory.__name__ = "character.Inventory";
@@ -9273,6 +9628,7 @@ character_Inventory.prototype = {
 	,souperSpice: null
 	,redFlower: null
 	,yellowFlower: null
+	,blueFlower: null
 	,addCarrots: function(changeBy) {
 		var tmp = this;
 		tmp.carrots += changeBy;
@@ -9342,6 +9698,16 @@ character_Inventory.prototype = {
 		var tmp = this;
 		tmp.yellowFlower -= changeBy;
 		return tmp.yellowFlower;
+	}
+	,addBlueFlowers: function(changeBy) {
+		var tmp = this;
+		tmp.blueFlower += changeBy;
+		return tmp.blueFlower;
+	}
+	,consumeBlueFlower: function(changeBy) {
+		var tmp = this;
+		tmp.blueFlower -= changeBy;
+		return tmp.blueFlower;
 	}
 	,__class__: character_Inventory
 };
@@ -70254,7 +70620,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 604975;
+	this.version = 952291;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -117416,9 +117782,9 @@ openfl_display_DisplayObject.__tempStack = new lime_utils_ObjectPool(function() 
 },function(stack) {
 	stack.set_length(0);
 });
+flixel_FlxBasic.idEnumerator = 0;
 openfl_text_Font.__fontByName = new haxe_ds_StringMap();
 openfl_text_Font.__registeredFonts = [];
-flixel_FlxBasic.idEnumerator = 0;
 Xml.Element = 0;
 Xml.PCData = 1;
 Xml.CData = 2;

@@ -85,7 +85,7 @@ class MilkBarn extends FlxState
 		benchBox = new BackgroundBox(300, 830, 200, 200);
 		add(benchBox);
 
-		instructionStart = new Wall(50, 500, 100, 100);
+		instructionStart = new Wall(0, 0, 1400, 1000);
 		add(instructionStart);
 
 		add(new FlxSprite(0, 0, "assets/images/Cows.png"));

@@ -54,6 +54,7 @@ class FlowerInstructionField extends FlxState
 		walls.add(new Wall(0, 900, 1400, 100)); // bottom border
 		walls.add(new Wall(1300, 0, 100, 1000)); // west Border
 		walls.add(new Wall(850, 900, 600, 100)); // bottom border pt2
+		walls.add(new Wall(0, 999, 1400, 1)); // bottom border pt 3
 		add(walls);
 
 		add(new FlxSprite(0, 0, "assets/images/Potato_Field.png"));
@@ -82,7 +83,7 @@ class FlowerInstructionField extends FlxState
 
 		recipeeText = new FlxText(325, 325, 650, " ", 24);
 
-		hero = new Hero(50, 50);
+		hero = new Hero(650, 850);
 		add(hero);
 
 		returnDisplayBox = new Wall(0, 0, 1400, 70);
@@ -140,17 +141,18 @@ class FlowerInstructionField extends FlxState
 							3 Parts Souper Spice
 							Gather Ingredients and add to the pot to make the Souper Soup and become a Souper Chef!
 							Enter to Exit";
-		if (FlxG.keys.justPressed.ENTER)
-		{
-			recipeeTextBox.kill();
-			recipeeText.kill();
-		}
 	}
 
 	override public function update(elapsed:Float)
 	{
 		FlxG.collide(hero, walls);
 		FlxG.overlap(hero, recipeeIcon, DisplayRecipee);
+
+		if (FlxG.keys.justPressed.ENTER)
+		{
+			recipeeTextBox.kill();
+			recipeeText.kill();
+		}
 
 		if (FlxG.keys.justPressed.R)
 		{

@@ -75,7 +75,7 @@ class CarrotField extends FlxState
 		walls.add(new Wall(1400, 0, 1, 1000)); // west Border
 		add(walls);
 
-		instructionStart = new Wall(50, 250, 100, 100);
+		instructionStart = new Wall(0, 0, 1400, 1000);
 		add(instructionStart);
 
 		add(new FlxSprite(0, 0, "assets/images/carrotFarm.png"));
@@ -112,7 +112,7 @@ class CarrotField extends FlxState
 		carrotGal = new NPC(1000, 300, "assets/images/carrotGirl.png");
 		add(carrotGal);
 
-		hero = new Hero(50, 250);
+		hero = new Hero(50, 260);
 		add(hero);
 
 		textBox = new Ingredient(25, 400, "assets/images/Text_Box.png");

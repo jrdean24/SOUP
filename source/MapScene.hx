@@ -109,7 +109,7 @@ class MapScene extends FlxState
 		add(yellowFlowerNum);
 		add(blueFlowerNum);
 
-		hero = new Hero(50, 250);
+		hero = new Hero(50, 800);
 		add(hero);
 	}
 

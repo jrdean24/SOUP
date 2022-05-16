@@ -70,7 +70,7 @@ class PotatoField extends FlxState
 		walls.add(new Wall(0, 999, 1400, 1)); // bottom border pt 3
 		add(walls);
 
-		instructionStart = new Wall(500, 700, 600, 300);
+		instructionStart = new Wall(0, 0, 1400, 1000);
 		add(instructionStart);
 
 		add(new FlxSprite(0, 0, "assets/images/Potato_Field.png"));
