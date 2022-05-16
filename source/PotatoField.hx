@@ -13,7 +13,7 @@ import item.Ingredient;
 import item.Wall;
 
 // Potato Field
-class Scene3 extends FlxState
+class PotatoField extends FlxState
 {
 	// inventory
 	var inventory:Inventory;

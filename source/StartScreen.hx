@@ -3,7 +3,7 @@ package;
 import flixel.FlxState;
 
 // Start Screen
-class Scene0 extends FlxState
+class StartScreen extends FlxState
 {
 	override public function create()
 	{

@@ -26,11 +26,11 @@ class MapScene extends FlxState
 	var hero:character.Hero;
 	var walls:FlxTypedGroup<item.Wall>;
 
-	var scene1Graphic:FlxSprite;
-	var scene2Graphic:FlxSprite;
-	var scene3Graphic:FlxSprite;
-	var scene4Graphic:FlxSprite;
-	var scene5Graphic:FlxSprite;
+	var SoupScreenGraphic:FlxSprite;
+	var CarrotFieldGraphic:FlxSprite;
+	var PotatoFieldGraphic:FlxSprite;
+	var MilkBarnGraphic:FlxSprite;
+	var GeneralStoreGraphic:FlxSprite;
 	var scene6Graphic:FlxSprite;
 
 	public function new(?incomingInventory:Inventory)
@@ -57,23 +57,23 @@ class MapScene extends FlxState
 		walls.add(new Wall(0, 1000, 1400, 1)); // Bottom Border
 		add(walls);
 
-		scene1Graphic = new FlxSprite(100, 700);
-		scene1Graphic.loadGraphic("assets/images/Pot.png", false, 150, 150);
-		scene2Graphic = new FlxSprite(300, 700);
-		scene2Graphic.loadGraphic("assets/images/Carrot.png", false, 150, 150);
-		scene3Graphic = new FlxSprite(500, 700);
-		scene3Graphic.loadGraphic("assets/images/Potato.png", false, 150, 150);
-		scene4Graphic = new FlxSprite(700, 700);
-		scene4Graphic.loadGraphic("assets/images/milk.png", false, 150, 150);
-		scene5Graphic = new FlxSprite(900, 700);
-		scene5Graphic.loadGraphic("assets/images/onion.png", false, 150, 150);
+		SoupScreenGraphic = new FlxSprite(100, 700);
+		SoupScreenGraphic.loadGraphic("assets/images/Pot.png", false, 150, 150);
+		CarrotFieldGraphic = new FlxSprite(300, 700);
+		CarrotFieldGraphic.loadGraphic("assets/images/Carrot.png", false, 150, 150);
+		PotatoFieldGraphic = new FlxSprite(500, 700);
+		PotatoFieldGraphic.loadGraphic("assets/images/Potato.png", false, 150, 150);
+		MilkBarnGraphic = new FlxSprite(700, 700);
+		MilkBarnGraphic.loadGraphic("assets/images/milk.png", false, 150, 150);
+		GeneralStoreGraphic = new FlxSprite(900, 700);
+		GeneralStoreGraphic.loadGraphic("assets/images/onion.png", false, 150, 150);
 		scene6Graphic = new FlxSprite(1100, 700);
 		scene6Graphic.loadGraphic("assets/images/redflower.png", false, 150, 150);
-		add(scene1Graphic);
-		add(scene2Graphic);
-		add(scene3Graphic);
-		add(scene4Graphic);
-		add(scene5Graphic);
+		add(SoupScreenGraphic);
+		add(CarrotFieldGraphic);
+		add(PotatoFieldGraphic);
+		add(MilkBarnGraphic);
+		add(GeneralStoreGraphic);
 		add(scene6Graphic);
 
 		add(new FlxText(200, 500, 0, "Gather Ingredients, then return to Campfire.", 38));
@@ -101,29 +101,29 @@ class MapScene extends FlxState
 		add(hero);
 	}
 
-	private function goToScene1(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	private function goToSoupScreen(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
-		FlxG.switchState(new Scene1(inventory));
+		FlxG.switchState(new SoupScreen(inventory));
 	}
 
-	private function goToScene2(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	private function goToCarrotField(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
-		FlxG.switchState(new Scene2(inventory));
+		FlxG.switchState(new CarrotField(inventory));
 	}
 
-	private function goToScene3(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	private function goToPotatoField(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
-		FlxG.switchState(new Scene3(inventory));
+		FlxG.switchState(new PotatoField(inventory));
 	}
 
-	private function goToScene4(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	private function goToMilkBarn(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
-		FlxG.switchState(new Scene4(inventory));
+		FlxG.switchState(new MilkBarn(inventory));
 	}
 
-	private function goToScene5(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	private function goToGeneralStore(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
-		FlxG.switchState(new Scene5(inventory));
+		FlxG.switchState(new GeneralStore(inventory));
 	}
 
 	private function goToScene6(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
@@ -133,11 +133,11 @@ class MapScene extends FlxState
 
 	override public function update(elapsed:Float)
 	{
-		FlxG.overlap(scene1Graphic, hero, goToScene1);
-		FlxG.overlap(scene2Graphic, hero, goToScene2);
-		FlxG.overlap(scene3Graphic, hero, goToScene3);
-		FlxG.overlap(scene4Graphic, hero, goToScene4);
-		FlxG.overlap(scene5Graphic, hero, goToScene5);
+		FlxG.overlap(SoupScreenGraphic, hero, goToSoupScreen);
+		FlxG.overlap(CarrotFieldGraphic, hero, goToCarrotField);
+		FlxG.overlap(PotatoFieldGraphic, hero, goToPotatoField);
+		FlxG.overlap(MilkBarnGraphic, hero, goToMilkBarn);
+		FlxG.overlap(GeneralStoreGraphic, hero, goToGeneralStore);
 		FlxG.overlap(scene6Graphic, hero, goToScene6);
 		FlxG.collide(hero, walls);
 

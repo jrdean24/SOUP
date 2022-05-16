@@ -13,7 +13,7 @@ import item.Ingredient;
 import item.Wall;
 
 // Milk Barn
-class Scene4 extends FlxState
+class MilkBarn extends FlxState
 {
 	var inventory:Inventory;
 

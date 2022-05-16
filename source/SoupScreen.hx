@@ -1,14 +1,18 @@
 package;
 
+import character.Hero;
 import character.Inventory;
 import flixel.FlxG;
+import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import item.Ingredient;
 import item.Wall;
 
-// Win Screens
-class Scene7 extends FlxState
+// Soup Location
+class SoupScreen extends FlxState
 {
 	var inventory:Inventory;
 
@@ -22,7 +26,12 @@ class Scene7 extends FlxState
 	var inventoryDisplayBox:Wall;
 	var returnDisplayBox:Wall;
 
-	var totalPts:Int = 0;
+	var hero:character.Hero;
+	var pot:item.Ingredient;
+
+	var winScreenSprite:Wall;
+	var backgroundSprite:FlxSprite;
+	var walls:FlxTypedGroup<item.Wall>;
 
 	public function new(incomingInventory:Inventory)
 	{
@@ -33,6 +42,33 @@ class Scene7 extends FlxState
 	override public function create()
 	{
 		super.create();
+
+		walls = new FlxTypedGroup<item.Wall>();
+		walls.add(new Wall(0, 0, 1400, 1)); // top border
+		walls.add(new Wall(0, 0, 1, 1000)); // east border
+		walls.add(new Wall(0, 1000, 1400, 1)); // bottom border
+		walls.add(new Wall(1400, 0, 1, 1000)); // west Border
+		walls.add(new Wall(0, 20, 70, 150)); // top tree
+		walls.add(new Wall(820, 900, 200, 100)); // Bottom tree
+		walls.add(new Wall(650, 360, 100, 20)); // top log
+		walls.add(new Wall(540, 500, 30, 80)); // west log
+		walls.add(new Wall(840, 500, 30, 80)); // east log
+		add(walls);
+
+		winScreenSprite = new Wall(690, 400, 100, 100);
+		add(winScreenSprite);
+
+		backgroundSprite = new FlxSprite(0, 0, "assets/images/SoupLocation.png");
+		add(backgroundSprite);
+
+		pot = new Ingredient(655, 400, "assets/images/Pot.png");
+		add(pot);
+
+		add(new FlxText(100, 270, 1200, "Total needed: 18 Carrots, 17 Potatoes, 4 Bottles of Milk, 9 Onions, and 3 Parts Souper Spice", 20));
+		add(new FlxText(400, 200, 0, "Go to Pot to Make Soup", 38));
+
+		hero = new Hero(50, 200);
+		add(hero);
 
 		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
 		inventoryDisplayBox.color = FlxColor.GRAY;
@@ -52,43 +88,6 @@ class Scene7 extends FlxState
 		add(redFlowerNum);
 		add(yellowFlowerNum);
 
-		if (inventory.carrots >= 18)
-		{
-			totalPts += 1;
-		}
-		if (inventory.potatoes >= 17)
-		{
-			totalPts += 1;
-		}
-		if (inventory.milk >= 4)
-		{
-			totalPts += 1;
-		}
-		if (inventory.onions >= 9)
-		{
-			totalPts += 1;
-		}
-		if (inventory.souperSpice >= 3)
-		{
-			totalPts += 1;
-		}
-
-		if (totalPts == 5)
-		{
-			add(new FlxText(200, 200, 0, "COMPLETED 100%!", 32));
-			add(new FlxText(200, 300, 0, "You are a Souper Chef!", 32));
-		}
-		else if (totalPts > 0 && totalPts < 5)
-		{
-			add(new FlxText(200, 200, 0, "The Legendary Soup is somewhat complete...", 32));
-			add(new FlxText(200, 300, 0, "You are a somewhat decent chef, we suppose...", 32));
-		}
-		else if (totalPts == 0)
-		{
-			add(new FlxText(200, 200, 0, "You have made Air Soup", 32));
-			add(new FlxText(200, 300, 0, "You call yourself a chef?!?!", 32));
-		}
-
 		returnDisplayBox = new Wall(0, 0, 400, 70);
 		returnDisplayBox.color = FlxColor.GRAY;
 		add(returnDisplayBox);
@@ -100,8 +99,16 @@ class Scene7 extends FlxState
 		FlxG.switchState(new MapScene(inventory));
 	}
 
+	private function goToWinScreen(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		FlxG.switchState(new WinScreens(inventory));
+	}
+
 	override public function update(elapsed:Float)
 	{
+		FlxG.overlap(winScreenSprite, hero, goToWinScreen);
+		FlxG.collide(hero, walls);
+
 		if (FlxG.keys.justPressed.R)
 		{
 			FlxG.switchState(new MapScene(inventory));

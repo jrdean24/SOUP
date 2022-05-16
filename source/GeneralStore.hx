@@ -12,7 +12,7 @@ import item.Ingredient;
 import item.Wall;
 
 // Onion Shop
-class Scene5 extends FlxState
+class GeneralStore extends FlxState
 {
 	var inventory:Inventory;
 

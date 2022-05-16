@@ -12,7 +12,7 @@ import item.Ingredient;
 import item.Wall;
 
 // Carrot Farm
-class Scene2 extends FlxState
+class CarrotField extends FlxState
 {
 	var inventory:Inventory;
 
