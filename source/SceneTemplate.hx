@@ -1,15 +1,17 @@
 package;
 
+import character.Hero;
 import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import item.Ingredient;
 import item.Wall;
 
-// Win Screens
-class WinScreens extends FlxState
+class SceneTemplate extends FlxState
 {
 	var inventory:Inventory;
 
@@ -21,10 +23,11 @@ class WinScreens extends FlxState
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
 	var blueFlowerNum:FlxText;
-	var inventoryDisplayBox:Wall;
 	var returnDisplayBox:Wall;
+	var inventoryDisplayBox:Wall;
 
-	var totalPts:Int = 0;
+	var walls:FlxTypedGroup<Wall>;
+	var hero:Hero;
 
 	public function new(incomingInventory:Inventory)
 	{
@@ -35,6 +38,13 @@ class WinScreens extends FlxState
 	override public function create()
 	{
 		super.create();
+
+		walls = new FlxTypedGroup<item.Wall>();
+		walls.add(new Wall(0, 0, 1400, 70)); // top border
+		walls.add(new Wall(0, 0, 1, 1000)); // east border
+		walls.add(new Wall(0, 900, 1400, 100)); // bottom border
+		walls.add(new Wall(1300, 0, 100, 1000)); // west Border
+		add(walls);
 
 		returnDisplayBox = new Wall(0, 0, 1400, 70);
 		returnDisplayBox.color = FlxColor.GRAY;
@@ -67,42 +77,8 @@ class WinScreens extends FlxState
 		add(yellowFlowerNum);
 		add(blueFlowerNum);
 
-		if (inventory.carrots >= 18)
-		{
-			totalPts += 1;
-		}
-		if (inventory.potatoes >= 17)
-		{
-			totalPts += 1;
-		}
-		if (inventory.milk >= 4)
-		{
-			totalPts += 1;
-		}
-		if (inventory.onions >= 9)
-		{
-			totalPts += 1;
-		}
-		if (inventory.souperSpice >= 3)
-		{
-			totalPts += 1;
-		}
-
-		if (totalPts == 5)
-		{
-			add(new FlxText(200, 200, 0, "COMPLETED 100%!", 32));
-			add(new FlxText(200, 300, 0, "You are a Souper Chef!", 32));
-		}
-		else if (totalPts > 0 && totalPts < 5)
-		{
-			add(new FlxText(200, 200, 0, "The Legendary Soup is somewhat complete...", 32));
-			add(new FlxText(200, 300, 0, "You are a somewhat decent chef, we suppose...", 32));
-		}
-		else if (totalPts == 0)
-		{
-			add(new FlxText(200, 200, 0, "You have made Air Soup", 32));
-			add(new FlxText(200, 300, 0, "You call yourself a chef?!?!", 32));
-		}
+		hero = new Hero(650, 850);
+		add(hero);
 	}
 
 	private function backToMap()
@@ -112,7 +88,9 @@ class WinScreens extends FlxState
 
 	override public function update(elapsed:Float)
 	{
-		if (FlxG.keys.justPressed.R)
+		FlxG.collide(hero, walls);
+
+		if (FlxG.keys.justReleased.R)
 		{
 			FlxG.switchState(new MapScene(inventory));
 		}

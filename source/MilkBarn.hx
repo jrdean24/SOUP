@@ -2,6 +2,7 @@ package;
 
 import character.Hero;
 import character.Inventory;
+import character.NPC;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -24,6 +25,7 @@ class MilkBarn extends FlxState
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var blueFlowerNum:FlxText;
 	var inventoryDisplayBox:Wall;
 	var returnDisplayBox:Wall;
 
@@ -39,6 +41,10 @@ class MilkBarn extends FlxState
 	var emptyBucket1:Bool = true;
 	var emptyBucket2:Bool = true;
 	var benchBox:item.BackgroundBox;
+	var instructionStart:Wall;
+	var textBox:Ingredient;
+	var instructions:FlxText;
+	var milkLady:NPC;
 
 	// name to put into load graphics
 	var emptyPail:String = "assets/images/milkPail.png";
@@ -79,6 +85,9 @@ class MilkBarn extends FlxState
 		benchBox = new BackgroundBox(300, 830, 200, 200);
 		add(benchBox);
 
+		instructionStart = new Wall(50, 500, 100, 100);
+		add(instructionStart);
+
 		add(new FlxSprite(0, 0, "assets/images/Cows.png"));
 
 		pail1 = new Ingredient(400, 600, "assets/images/milkPail.png");
@@ -94,18 +103,36 @@ class MilkBarn extends FlxState
 		add(pail1);
 		add(pail2);
 
+		milkLady = new NPC(50, 800, "assets/images/girlSmall.png");
+		add(milkLady);
+
 		hero = new Hero(50, 500);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
-		inventoryDisplayBox.color = FlxColor.GRAY;
-		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
-		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
-		milkNum = new FlxText(1100, 80, 0, "Milk Bottles: " + inventory.milk, 24, true);
-		onionNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
-		souperSpiceNum = new FlxText(1100, 140, 0, "Souper Spice: " + inventory.souperSpice, 24, true);
-		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
-		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
+		textBox = new Ingredient(25, 400, "assets/images/Text_Box.png");
+		instructions = new FlxText(50, 425, 1300, " ", 24);
+
+		returnDisplayBox = new Wall(0, 0, 1400, 70);
+		returnDisplayBox.color = FlxColor.GRAY;
+		add(returnDisplayBox);
+		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
+
+		add(new FlxSprite(425, 10, "assets/images/Carrot.png"));
+		add(new FlxSprite(540, 10, "assets/images/Potato.png"));
+		add(new FlxSprite(655, 10, "assets/images/milk.png"));
+		add(new FlxSprite(770, 10, "assets/images/onion.png"));
+		add(new FlxSprite(885, 10, "assets/images/souperSpice.png"));
+		add(new FlxSprite(1000, 10, "assets/images/redFlowerIcon.png"));
+		add(new FlxSprite(1115, 10, "assets/images/yellowFlowerIcon.png"));
+		add(new FlxSprite(1230, 10, "assets/images/blueFlowerIcon.png"));
+		carrotNum = new FlxText(475, 20, 0, " " + inventory.carrots, 24, true);
+		potatoNum = new FlxText(590, 20, 0, " " + inventory.potatoes, 24, true);
+		milkNum = new FlxText(705, 20, 0, " " + inventory.milk, 24, true);
+		onionNum = new FlxText(820, 20, 0, " " + inventory.onions, 24, true);
+		souperSpiceNum = new FlxText(935, 20, 0, " " + inventory.souperSpice, 24, true);
+		redFlowerNum = new FlxText(1050, 20, 0, " " + inventory.redFlower, 24, true);
+		yellowFlowerNum = new FlxText(1165, 20, 0, " " + inventory.yellowFlower, 24, true);
+		blueFlowerNum = new FlxText(1280, 20, 0, " " + inventory.blueFlower, 24, true);
 		add(inventoryDisplayBox);
 		add(carrotNum);
 		add(potatoNum);
@@ -114,11 +141,7 @@ class MilkBarn extends FlxState
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-
-		returnDisplayBox = new Wall(0, 0, 400, 70);
-		returnDisplayBox.color = FlxColor.GRAY;
-		add(returnDisplayBox);
-		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
+		add(blueFlowerNum);
 	}
 
 	private function backToMap()
@@ -131,7 +154,7 @@ class MilkBarn extends FlxState
 		obj1.kill();
 		milkCount += 2;
 		inventory.addMilk(2);
-		milkNum.text = "Milk Bottles: " + inventory.milk;
+		milkNum.text = " " + inventory.milk;
 	}
 
 	public function FillBucket1(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
@@ -142,6 +165,18 @@ class MilkBarn extends FlxState
 	public function FillBucket2(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
 	{
 		pailFillingBuffer2--;
+	}
+
+	private function DisplayInstructions(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		add(textBox);
+		add(instructions);
+		instructions.text = "Hello, welcome to the Dariy! Push the buckets to the cows to milk them. When you're done, you can put the full buckets on the bench and I will bottle it up for you. Fair warning, some of our buckets may have holes, and you may need to come back later to find non-holey bukcets. Enter to exit";
+		if (FlxG.keys.justPressed.ENTER)
+		{
+			textBox.kill();
+			instructions.kill();
+		}
 	}
 
 	override public function update(elapsed:Float)
@@ -158,6 +193,7 @@ class MilkBarn extends FlxState
 		FlxG.collide(hero, walls);
 		FlxG.collide(pail1, wallForPail);
 		FlxG.collide(pail2, wallForPail);
+		FlxG.overlap(instructionStart, hero, DisplayInstructions);
 
 		if (pailFillingBuffer1 == 0 && emptyBucket1)
 		{

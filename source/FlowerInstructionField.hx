@@ -1,15 +1,18 @@
 package;
 
+import character.Hero;
 import character.Inventory;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import item.Ingredient;
 import item.Wall;
 
-// Win Screens
-class WinScreens extends FlxState
+// Instruction Flower Field
+class FlowerInstructionField extends FlxState
 {
 	var inventory:Inventory;
 
@@ -23,8 +26,17 @@ class WinScreens extends FlxState
 	var blueFlowerNum:FlxText;
 	var inventoryDisplayBox:Wall;
 	var returnDisplayBox:Wall;
+	var walls:FlxTypedGroup<Wall>;
 
-	var totalPts:Int = 0;
+	var hero:Hero;
+	var redFlowers:FlxTypedGroup<Ingredient>;
+	var yellowFlowers:FlxTypedGroup<Ingredient>;
+	var randomXLocation:Float = 0;
+	var randomYLocation:Float = 0;
+	var recipeeIcon:Wall;
+
+	var recipeeText:FlxText;
+	var recipeeTextBox:Wall;
 
 	public function new(incomingInventory:Inventory)
 	{
@@ -35,6 +47,43 @@ class WinScreens extends FlxState
 	override public function create()
 	{
 		super.create();
+
+		walls = new FlxTypedGroup<item.Wall>();
+		walls.add(new Wall(0, 0, 1400, 100)); // top border
+		walls.add(new Wall(0, 0, 100, 1000)); // east border
+		walls.add(new Wall(0, 900, 1400, 100)); // bottom border
+		walls.add(new Wall(1300, 0, 100, 1000)); // west Border
+		walls.add(new Wall(850, 900, 600, 100)); // bottom border pt2
+		add(walls);
+
+		add(new FlxSprite(0, 0, "assets/images/Potato_Field.png"));
+
+		for (i in 0...50)
+		{
+			randomizeLocation();
+			add(new Ingredient(randomXLocation, randomYLocation, "assets/images/Red_Flower.png"));
+		}
+		for (i in 0...50)
+		{
+			randomizeLocation();
+			add(new Ingredient(randomXLocation, randomYLocation, "assets/images/Yellow_Flower.png"));
+		}
+		for (i in 0...50)
+		{
+			randomizeLocation();
+			add(new Ingredient(randomXLocation, randomYLocation, "assets/images/Blue_Flower.png"));
+		}
+
+		recipeeIcon = new Wall(675, 475, 50, 50);
+		add(recipeeIcon);
+
+		recipeeTextBox = new Wall(300, 300, 700, 600);
+		recipeeTextBox.color = FlxColor.GRAY;
+
+		recipeeText = new FlxText(325, 325, 650, " ", 24);
+
+		hero = new Hero(50, 50);
+		add(hero);
 
 		returnDisplayBox = new Wall(0, 0, 1400, 70);
 		returnDisplayBox.color = FlxColor.GRAY;
@@ -66,43 +115,6 @@ class WinScreens extends FlxState
 		add(redFlowerNum);
 		add(yellowFlowerNum);
 		add(blueFlowerNum);
-
-		if (inventory.carrots >= 18)
-		{
-			totalPts += 1;
-		}
-		if (inventory.potatoes >= 17)
-		{
-			totalPts += 1;
-		}
-		if (inventory.milk >= 4)
-		{
-			totalPts += 1;
-		}
-		if (inventory.onions >= 9)
-		{
-			totalPts += 1;
-		}
-		if (inventory.souperSpice >= 3)
-		{
-			totalPts += 1;
-		}
-
-		if (totalPts == 5)
-		{
-			add(new FlxText(200, 200, 0, "COMPLETED 100%!", 32));
-			add(new FlxText(200, 300, 0, "You are a Souper Chef!", 32));
-		}
-		else if (totalPts > 0 && totalPts < 5)
-		{
-			add(new FlxText(200, 200, 0, "The Legendary Soup is somewhat complete...", 32));
-			add(new FlxText(200, 300, 0, "You are a somewhat decent chef, we suppose...", 32));
-		}
-		else if (totalPts == 0)
-		{
-			add(new FlxText(200, 200, 0, "You have made Air Soup", 32));
-			add(new FlxText(200, 300, 0, "You call yourself a chef?!?!", 32));
-		}
 	}
 
 	private function backToMap()
@@ -110,13 +122,40 @@ class WinScreens extends FlxState
 		FlxG.switchState(new MapScene(inventory));
 	}
 
+	private function randomizeLocation()
+	{
+		randomXLocation = FlxG.random.float(100, 1200);
+		randomYLocation = FlxG.random.float(100, 800);
+	}
+
+	private function DisplayRecipee(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		add(recipeeTextBox);
+		add(recipeeText);
+		recipeeText.text = "Souper Soup Reicpee:  
+							18 Carrots
+							17 Potatoes
+							4 Bottles of Milk
+							9 Onions
+							3 Parts Souper Spice
+							Gather Ingredients and add to the pot to make the Souper Soup and become a Souper Chef!
+							Enter to Exit";
+		if (FlxG.keys.justPressed.ENTER)
+		{
+			recipeeTextBox.kill();
+			recipeeText.kill();
+		}
+	}
+
 	override public function update(elapsed:Float)
 	{
+		FlxG.collide(hero, walls);
+		FlxG.overlap(hero, recipeeIcon, DisplayRecipee);
+
 		if (FlxG.keys.justPressed.R)
 		{
 			FlxG.switchState(new MapScene(inventory));
 		}
-
 		super.update(elapsed);
 	}
 }

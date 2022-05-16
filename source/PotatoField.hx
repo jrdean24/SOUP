@@ -2,6 +2,7 @@ package;
 
 import character.Hero;
 import character.Inventory;
+import character.NPC;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -26,6 +27,7 @@ class PotatoField extends FlxState
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var blueFlowerNum:FlxText;
 	var inventoryDisplayBox:Wall;
 	var returnDisplayBox:Wall;
 
@@ -37,6 +39,10 @@ class PotatoField extends FlxState
 	var walls:FlxTypedGroup<item.Wall>;
 	var randomXLocation:Float = 0;
 	var randomYLocation:Float = 0;
+	var instructionStart:Wall;
+	var textBox:Ingredient;
+	var instructions:FlxText;
+	var potatoMan:NPC;
 
 	// name to put into load graphics
 	var potatoIcon:String = "assets/images/Potato.png";
@@ -58,10 +64,14 @@ class PotatoField extends FlxState
 		walls = new FlxTypedGroup<item.Wall>();
 		walls.add(new Wall(0, 0, 1400, 100)); // top border
 		walls.add(new Wall(0, 0, 100, 1000)); // east border
-		walls.add(new Wall(0, 900, 1400, 100)); // bottom border
+		walls.add(new Wall(0, 900, 550, 100)); // bottom border
 		walls.add(new Wall(1300, 0, 100, 1000)); // west Border
 		walls.add(new Wall(850, 900, 600, 100)); // bottom border pt2
+		walls.add(new Wall(0, 999, 1400, 1)); // bottom border pt 3
 		add(walls);
+
+		instructionStart = new Wall(500, 700, 600, 300);
+		add(instructionStart);
 
 		add(new FlxSprite(0, 0, "assets/images/Potato_Field.png"));
 
@@ -104,18 +114,36 @@ class PotatoField extends FlxState
 		bushes.add(new Bush(230, 648, bush2));
 		add(bushes);
 
+		potatoMan = new NPC(600, 800, "assets/images/PotatoSouth.png");
+		add(potatoMan);
+
 		hero = new Hero(650, 850);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
-		inventoryDisplayBox.color = FlxColor.fromString("0xAA808080");
-		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
-		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
-		milkNum = new FlxText(1100, 80, 0, "Milk Bottle: " + inventory.milk, 24, true);
-		onionNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
-		souperSpiceNum = new FlxText(1100, 140, 0, "Souper Spice: " + inventory.souperSpice, 24, true);
-		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
-		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
+		textBox = new Ingredient(25, 400, "assets/images/Text_Box.png");
+		instructions = new FlxText(50, 425, 1300, " ", 24);
+
+		returnDisplayBox = new Wall(0, 0, 1400, 70);
+		returnDisplayBox.color = FlxColor.GRAY;
+		add(returnDisplayBox);
+		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
+
+		add(new FlxSprite(425, 10, "assets/images/Carrot.png"));
+		add(new FlxSprite(540, 10, "assets/images/Potato.png"));
+		add(new FlxSprite(655, 10, "assets/images/milk.png"));
+		add(new FlxSprite(770, 10, "assets/images/onion.png"));
+		add(new FlxSprite(885, 10, "assets/images/souperSpice.png"));
+		add(new FlxSprite(1000, 10, "assets/images/redFlowerIcon.png"));
+		add(new FlxSprite(1115, 10, "assets/images/yellowFlowerIcon.png"));
+		add(new FlxSprite(1230, 10, "assets/images/blueFlowerIcon.png"));
+		carrotNum = new FlxText(475, 20, 0, " " + inventory.carrots, 24, true);
+		potatoNum = new FlxText(590, 20, 0, " " + inventory.potatoes, 24, true);
+		milkNum = new FlxText(705, 20, 0, " " + inventory.milk, 24, true);
+		onionNum = new FlxText(820, 20, 0, " " + inventory.onions, 24, true);
+		souperSpiceNum = new FlxText(935, 20, 0, " " + inventory.souperSpice, 24, true);
+		redFlowerNum = new FlxText(1050, 20, 0, " " + inventory.redFlower, 24, true);
+		yellowFlowerNum = new FlxText(1165, 20, 0, " " + inventory.yellowFlower, 24, true);
+		blueFlowerNum = new FlxText(1280, 20, 0, " " + inventory.blueFlower, 24, true);
 		add(inventoryDisplayBox);
 		add(carrotNum);
 		add(potatoNum);
@@ -124,11 +152,7 @@ class PotatoField extends FlxState
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-
-		returnDisplayBox = new Wall(0, 0, 400, 70);
-		returnDisplayBox.color = FlxColor.GRAY;
-		add(returnDisplayBox);
-		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
+		add(blueFlowerNum);
 	}
 
 	private function backToMap()
@@ -141,7 +165,7 @@ class PotatoField extends FlxState
 		obj1.kill();
 		potatoCount++;
 		inventory.addPotatoes(1);
-		potatoNum.text = "Potatoes: " + inventory.potatoes;
+		potatoNum.text = " " + inventory.potatoes;
 	}
 
 	private function randomizeLocation()
@@ -150,10 +174,23 @@ class PotatoField extends FlxState
 		randomYLocation = FlxG.random.float(200, 800);
 	}
 
+	private function DisplayInstructions(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		add(textBox);
+		add(instructions);
+		instructions.text = "Hello, welcome to the Potato Farm! If you find any potatoes in the bushes, you can use those for your soup! Enter to exit";
+		if (FlxG.keys.justPressed.ENTER)
+		{
+			textBox.kill();
+			instructions.kill();
+		}
+	}
+
 	override public function update(elapsed:Float)
 	{
 		FlxG.overlap(potatoes, hero, AddPotato);
 		FlxG.collide(hero, walls);
+		FlxG.overlap(instructionStart, hero, DisplayInstructions);
 
 		if (FlxG.keys.justPressed.R)
 		{

@@ -2,6 +2,7 @@ package;
 
 import character.Hero;
 import character.Inventory;
+import character.NPC;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -23,6 +24,7 @@ class CarrotField extends FlxState
 	var souperSpiceNum:FlxText;
 	var redFlowerNum:FlxText;
 	var yellowFlowerNum:FlxText;
+	var blueFlowerNum:FlxText;
 	var inventoryDisplayBox:Wall;
 	var returnDisplayBox:Wall;
 
@@ -30,6 +32,10 @@ class CarrotField extends FlxState
 	var carrots:FlxTypedGroup<item.Ingredient>;
 	var glowcarrots:FlxTypedGroup<item.Ingredient>;
 	var carrotCount:Int = 0;
+	var instructionStart:Wall;
+	var textBox:Ingredient;
+	var instructions:FlxText;
+	var carrotGal:NPC;
 
 	var walls:FlxTypedGroup<item.Wall>;
 	var stageNum:Int = 1;
@@ -63,11 +69,14 @@ class CarrotField extends FlxState
 		walls.add(new Wall(FlxG.width - 100, 500, 100, 100)); // treestump
 		walls.add(new Wall(0, FlxG.height - 450, 100, 350)); // bottom tree
 		walls.add(new Wall(0, FlxG.height - 550, 30, 100)); // middle tree
-		walls.add(new Wall(0, 0, 1400, 1)); // top border
+		walls.add(new Wall(0, 0, 1400, 70)); // top border
 		walls.add(new Wall(0, 0, 1, 1000)); // east border
 		walls.add(new Wall(0, 1000, 1400, 1)); // bottom border
 		walls.add(new Wall(1400, 0, 1, 1000)); // west Border
 		add(walls);
+
+		instructionStart = new Wall(50, 250, 100, 100);
+		add(instructionStart);
 
 		add(new FlxSprite(0, 0, "assets/images/carrotFarm.png"));
 
@@ -100,18 +109,36 @@ class CarrotField extends FlxState
 		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.x = 25);
 		glowcarrots.forEach((carrot:Ingredient) -> carrot.offset.y = 25);
 
+		carrotGal = new NPC(1000, 300, "assets/images/carrotGirl.png");
+		add(carrotGal);
+
 		hero = new Hero(50, 250);
 		add(hero);
 
-		inventoryDisplayBox = new Wall(1090, 0, 300, 250);
-		inventoryDisplayBox.color = FlxColor.GRAY;
-		carrotNum = new FlxText(1100, 20, 0, "Carrots: " + inventory.carrots, 24, true);
-		potatoNum = new FlxText(1100, 50, 0, "Potatoes: " + inventory.potatoes, 24, true);
-		milkNum = new FlxText(1100, 80, 0, "Milk Bottle: " + inventory.milk, 24, true);
-		onionNum = new FlxText(1100, 110, 0, "Onions: " + inventory.onions, 24, true);
-		souperSpiceNum = new FlxText(1100, 140, 0, "Souper Spice: " + inventory.souperSpice, 24, true);
-		redFlowerNum = new FlxText(1100, 170, 0, "Red Flowers: " + inventory.redFlower, 24, true);
-		yellowFlowerNum = new FlxText(1100, 200, 0, "Yellow Flowers: " + inventory.yellowFlower, 24, true);
+		textBox = new Ingredient(25, 400, "assets/images/Text_Box.png");
+		instructions = new FlxText(50, 425, 1300, " ", 24);
+
+		returnDisplayBox = new Wall(0, 0, 1400, 70);
+		returnDisplayBox.color = FlxColor.GRAY;
+		add(returnDisplayBox);
+		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
+
+		add(new FlxSprite(425, 10, "assets/images/Carrot.png"));
+		add(new FlxSprite(540, 10, "assets/images/Potato.png"));
+		add(new FlxSprite(655, 10, "assets/images/milk.png"));
+		add(new FlxSprite(770, 10, "assets/images/onion.png"));
+		add(new FlxSprite(885, 10, "assets/images/souperSpice.png"));
+		add(new FlxSprite(1000, 10, "assets/images/redFlowerIcon.png"));
+		add(new FlxSprite(1115, 10, "assets/images/yellowFlowerIcon.png"));
+		add(new FlxSprite(1230, 10, "assets/images/blueFlowerIcon.png"));
+		carrotNum = new FlxText(475, 20, 0, " " + inventory.carrots, 24, true);
+		potatoNum = new FlxText(590, 20, 0, " " + inventory.potatoes, 24, true);
+		milkNum = new FlxText(705, 20, 0, " " + inventory.milk, 24, true);
+		onionNum = new FlxText(820, 20, 0, " " + inventory.onions, 24, true);
+		souperSpiceNum = new FlxText(935, 20, 0, " " + inventory.souperSpice, 24, true);
+		redFlowerNum = new FlxText(1050, 20, 0, " " + inventory.redFlower, 24, true);
+		yellowFlowerNum = new FlxText(1165, 20, 0, " " + inventory.yellowFlower, 24, true);
+		blueFlowerNum = new FlxText(1280, 20, 0, " " + inventory.blueFlower, 24, true);
 		add(inventoryDisplayBox);
 		add(carrotNum);
 		add(potatoNum);
@@ -120,11 +147,7 @@ class CarrotField extends FlxState
 		add(souperSpiceNum);
 		add(redFlowerNum);
 		add(yellowFlowerNum);
-
-		returnDisplayBox = new Wall(0, 0, 400, 70);
-		returnDisplayBox.color = FlxColor.GRAY;
-		add(returnDisplayBox);
-		add(new FlxText(20, 20, 0, "Use 'R' to return to Map.", 24));
+		add(blueFlowerNum);
 	}
 
 	public function CarrotStage1()
@@ -233,13 +256,26 @@ class CarrotField extends FlxState
 		obj1.kill();
 		carrotCount++;
 		inventory.addCarrots(1);
-		carrotNum.text = "Carrots: " + inventory.carrots;
+		carrotNum.text = " " + inventory.carrots;
+	}
+
+	private function DisplayInstructions(obj1:flixel.FlxBasic, obj2:flixel.FlxBasic)
+	{
+		add(textBox);
+		add(instructions);
+		instructions.text = "Hello, welcome to the Carrot Farm. Feel free to pick some carrots from the field for your soup! Enter to exit";
+		if (FlxG.keys.justPressed.ENTER)
+		{
+			textBox.kill();
+			instructions.kill();
+		}
 	}
 
 	override public function update(elapsed:Float)
 	{
 		FlxG.overlap(glowcarrots, hero, AddCarrot);
 		FlxG.collide(hero, walls);
+		FlxG.overlap(instructionStart, hero, DisplayInstructions);
 
 		if (carrotCount == 0 && stageNum == 1)
 		{

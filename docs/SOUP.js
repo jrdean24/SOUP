@@ -4739,7 +4739,7 @@ MapScene.prototype = $extend(flixel_FlxState.prototype,{
 	,scene3Graphic: null
 	,scene4Graphic: null
 	,scene5Graphic: null
-	,scene6Graphic: null
+	,FlowerInstructionFieldGraphic: null
 	,create: function() {
 		flixel_FlxState.prototype.create.call(this);
 		this.walls = new flixel_group_FlxTypedGroup();
@@ -4758,14 +4758,14 @@ MapScene.prototype = $extend(flixel_FlxState.prototype,{
 		this.scene4Graphic.loadGraphic("assets/images/milk.png",false,150,150);
 		this.scene5Graphic = new flixel_FlxSprite(900,700);
 		this.scene5Graphic.loadGraphic("assets/images/onion.png",false,150,150);
-		this.scene6Graphic = new flixel_FlxSprite(1100,700);
-		this.scene6Graphic.loadGraphic("assets/images/redflower.png",false,150,150);
+		this.FlowerInstructionFieldGraphic = new flixel_FlxSprite(1100,700);
+		this.FlowerInstructionFieldGraphic.loadGraphic("assets/images/redflower.png",false,150,150);
 		this.add(this.scene1Graphic);
 		this.add(this.scene2Graphic);
 		this.add(this.scene3Graphic);
 		this.add(this.scene4Graphic);
 		this.add(this.scene5Graphic);
-		this.add(this.scene6Graphic);
+		this.add(this.FlowerInstructionFieldGraphic);
 		this.add(new flixel_text_FlxText(200,500,0,"Gather Ingredients, then return to Campfire.",38));
 		this.add(new flixel_text_FlxText(250,550,0,"Walk to a Location to go to there",38));
 		this.inventoryDisplayBox = new item_Wall(1090,0,300,250);
@@ -4818,8 +4818,8 @@ MapScene.prototype = $extend(flixel_FlxState.prototype,{
 			flixel_FlxG.game._requestedState = nextState;
 		}
 	}
-	,goToScene6: function(obj1,obj2) {
-		var nextState = new Scene6(this.inventory);
+	,goToFlowerInstructionField: function(obj1,obj2) {
+		var nextState = new FlowerInstructionField(this.inventory);
 		if(flixel_FlxG.game._state.switchTo(nextState)) {
 			flixel_FlxG.game._requestedState = nextState;
 		}
@@ -4830,7 +4830,7 @@ MapScene.prototype = $extend(flixel_FlxState.prototype,{
 		flixel_FlxG.overlap(this.scene3Graphic,this.hero,$bind(this,this.goToScene3));
 		flixel_FlxG.overlap(this.scene4Graphic,this.hero,$bind(this,this.goToScene4));
 		flixel_FlxG.overlap(this.scene5Graphic,this.hero,$bind(this,this.goToScene5));
-		flixel_FlxG.overlap(this.scene6Graphic,this.hero,$bind(this,this.goToScene6));
+		flixel_FlxG.overlap(this.FlowerInstructionFieldGraphic,this.hero,$bind(this,this.goToFlowerInstructionField));
 		flixel_FlxG.overlap(this.hero,this.walls,null,flixel_FlxObject.separate);
 		flixel_FlxState.prototype.update.call(this,elapsed);
 	}
@@ -5692,16 +5692,16 @@ Scene5.prototype = $extend(flixel_FlxState.prototype,{
 	}
 	,__class__: Scene5
 });
-var Scene6 = function(incomingInventory) {
+var FlowerInstructionField = function(incomingInventory) {
 	this.randomYLocation = 0;
 	this.randomXLocation = 0;
 	flixel_FlxState.call(this);
 	this.inventory = incomingInventory;
 };
-$hxClasses["Scene6"] = Scene6;
-Scene6.__name__ = "Scene6";
-Scene6.__super__ = flixel_FlxState;
-Scene6.prototype = $extend(flixel_FlxState.prototype,{
+$hxClasses["FlowerInstructionField"] = FlowerInstructionField;
+FlowerInstructionField.__name__ = "FlowerInstructionField";
+FlowerInstructionField.__super__ = flixel_FlxState;
+FlowerInstructionField.prototype = $extend(flixel_FlxState.prototype,{
 	inventory: null
 	,carrotNum: null
 	,potatoNum: null
@@ -5799,7 +5799,7 @@ Scene6.prototype = $extend(flixel_FlxState.prototype,{
 		}
 		flixel_FlxState.prototype.update.call(this,elapsed);
 	}
-	,__class__: Scene6
+	,__class__: FlowerInstructionField
 });
 var Scene7 = function(incomingInventory) {
 	this.totalPts = 0;
