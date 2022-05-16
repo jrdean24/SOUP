@@ -1,6 +1,10 @@
 
 # Name of the game: SOUP
 
+https://jrdean24.github.io/SOUP/
+
+![SoupScreenShot](https://user-images.githubusercontent.com/77079578/168685613-0f2f07d8-2409-42e3-994b-af1c115b0323.jpg)
+
 ### Short description of gameplay:
 
     - There is a character you control using the arrow keys, and you interact with other characters and elements in the game using the mouse. You are on a mission to make the legendary soup. Collect all the ingredients for a chance to make the soup and become a souper chef!  
