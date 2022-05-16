@@ -9,6 +9,7 @@ class Inventory
 	public var souperSpice(default, null):Int;
 	public var redFlower(default, null):Int;
 	public var yellowFlower(default, null):Int;
+	public var blueFlower(default, null):Int;
 
 	public function new()
 	{
@@ -19,6 +20,7 @@ class Inventory
 		souperSpice = 0;
 		redFlower = 0;
 		yellowFlower = 0;
+		blueFlower = 0;
 	}
 
 	public function addCarrots(changeBy:Int):Int
@@ -89,5 +91,15 @@ class Inventory
 	public function consumeYellowFlowers(changeBy:Int):Int
 	{
 		return yellowFlower -= changeBy;
+	}
+
+	public function addBlueFlowers(changeBy:Int):Int
+	{
+		return blueFlower += changeBy;
+	}
+
+	public function consumeBlueFlower(changeBy:Int):Int
+	{
+		return blueFlower -= changeBy;
 	}
 }
